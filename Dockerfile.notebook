@@ -58,6 +58,8 @@ RUN pip install scikit-image jupyter notebook bokeh sklearn
 RUN mkdir /in
 RUN mkdir /out
 
+RUN jupyter nbextension enable --py widgetsnbextension
+
 ADD . /prog
 WORKDIR /prog
 
