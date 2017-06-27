@@ -53,9 +53,7 @@ RUN conda install -c menpo dlib=19.4
 
 RUN pip install git+https://github.com/ageitgey/face_recognition_models
 
-RUN pip install scikit-image
-RUN pip install jupyter
-RUN pip install notebook
+RUN pip install scikit-image jupyter notebook bokeh sklearn
 
 RUN mkdir /in
 RUN mkdir /out
@@ -63,5 +61,6 @@ RUN mkdir /out
 ADD . /prog
 WORKDIR /prog
 
-CMD ["/opt/conda/bin/python","./directFeatures.py"]
+EXPOSE 8888
+CMD ["/opt/conda/bin/jupyter","notebook","--allow-root","--port=8888","--ip=0.0.0.0","--no-browser"]
 

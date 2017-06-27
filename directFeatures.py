@@ -279,4 +279,3 @@ if __name__ == '__main__':
         ext = f.split('.')[-1]
         if ext in ['avi','mov','mp4']:
             process_vid(f)
-            break
