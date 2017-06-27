@@ -87,7 +87,7 @@ def process_vid(filename):
                 current = people[person]
                 facevec = current['face_vec']
                 times = current['times']
-                match = compare_faces([facevec], face_encoding)
+                match = face.compare_faces([facevec], face_encoding)
 
                 if match[0]:
                     exists = True
