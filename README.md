@@ -4,10 +4,10 @@ makes a summary of faces seen in a video
 # Video Processing container
 
 ## build the container
-docker build -f Dockerfile.processing -t vfs.processing .
+docker build -f Dockerfile.process -t vfs.process .
 
 ## run the container
-docker run -v /dirWith1movie:/in -v /outputDir:/out vfs
+docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process
 
 # Jupyter container
 
