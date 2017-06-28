@@ -60,12 +60,11 @@ def process_vid(filename):
                 print('faces found :',len(people))
                 sys.stdout.flush()
 
-        try:
-            small_img = cv2.resize(img, (0, 0), fx=1.0/reduceby, fy=1.0/reduceby)
-        except:
-            print('end of capture:image resize')
-            sys.stdout.flush()
+
+        if not keepGoing:
             break
+
+        small_img = cv2.resize(img, (0, 0), fx=1.0/reduceby, fy=1.0/reduceby)
  
 
         list_face_locations = face.face_locations(small_img)
@@ -120,6 +119,7 @@ def process_vid(filename):
                 cv2.rectangle(small_img, (left, top),
                               (right, bottom), (255, 0, 0), 2)
 
+    #finished processing file for faces write out pickle
     print('processing completed writing outputfile\n')
     out_file = join('/out','{0}.face_detected.pickle'.format(filename))
     print('writting output to',out_file)
