@@ -18,7 +18,7 @@ docker build -f Dockerfile.notebook -t vfs.notebook .
 docker run -v /someDirWithdatafiles:/in  -p8888:8888 vfs.notebook
 
 # Tiny Face container
-## Counts the number of faces in a picture
+### Counts the number of faces in a picture
 
 ## build the CPU container
 docker build -f Dockerfile.tinyface -t vfs.tinyface .
