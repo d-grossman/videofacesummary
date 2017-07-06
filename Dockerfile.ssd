@@ -1,0 +1,62 @@
+FROM ubuntu:14.04
+MAINTAINER caffe-maint@googlegroups.com
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        libatlas-base-dev \
+        libboost-all-dev \
+        libgflags-dev \
+        libgoogle-glog-dev \
+        libhdf5-serial-dev \
+        libleveldb-dev \
+        liblmdb-dev \
+        libopencv-dev \
+        libprotobuf-dev \
+        libsnappy-dev \
+        protobuf-compiler \
+        python-dev \
+        python-numpy \
+        python-pip \
+        python-scipy && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV CAFFE_ROOT=/opt/caffe
+WORKDIR $CAFFE_ROOT
+
+# FIXME: clone a specific git tag and use ARG instead of ENV once DockerHub supports this.
+ENV CLONE_TAG=ssd
+
+RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/weiliu89/caffe.git . && \
+    for req in $(cat python/requirements.txt) pydot; do pip install $req; done 
+    
+# Fold in makefile.config fixes to run on cpu
+COPY ssd/Makefile.config.ssdfixes Makefile.config
+# Avoid 'cannot find -lopenblas' error
+RUN apt-get update
+RUN apt-get install -y --no-install-recommends liblapack-dev liblapack3 libopenblas-base libopenblas-dev
+RUN make -j8 
+RUN make py 
+RUN make test -j8
+
+ENV PYCAFFE_ROOT $CAFFE_ROOT/python
+ENV PYTHONPATH $PYCAFFE_ROOT:$PYTHONPATH
+ENV PATH $CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
+RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+
+WORKDIR /opt/caffe/
+RUN pip install -U setuptools
+RUN pip install IPython==5.0 jupyter
+
+# Fold in model downloaded locally from https://drive.google.com/open?id=0BzKzrI_SkD1_WVVTSmQxU0dVRzA
+COPY ssd/models_VGGNet_VOC0712_SSD_300x300.tar.gz models_VGGNet_VOC0712_SSD_300x300.tar.gz 
+RUN tar -xvf models_VGGNet_VOC0712_SSD_300x300.tar.gz models/
+RUN rm models_VGGNet_VOC0712_SSD_300x300.tar.gz
+COPY ssd/ssd_detect.ipynb examples/ssd_detect.ipynb
+
+EXPOSE 8888
+CMD ["/usr/local/bin/jupyter","notebook","--allow-root","--port=8888","--ip=0.0.0.0","--no-browser"]
+
+
