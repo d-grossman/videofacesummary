@@ -1,0 +1,16 @@
+FROM mxnet/python
+RUN mkdir /tinyface
+WORKDIR /tinyface
+RUN git clone https://github.com/chinakook/hr101_mxnet.git
+WORKDIR /tinyface/hr101_mxnet
+RUN grep -v "~/dev/tiny/trained_models/" matconvnet_hr101_to_mxnet.py > temp.py
+RUN echo "matpath='hr_res101.mat'" > temp2.py
+RUN cat temp2.py temp.py > matconvnet_hr101_to_mxnet.py
+RUN rm temp*.py
+RUN wget https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
+RUN pip install scipy matplotlib 
+RUN apt-get install -y python-tk python-opencv
+RUN python matconvnet_hr101_to_mxnet.py
+COPY tinyface/tiny_detection_mxnet.py tiny_detection_mxnet.py
+CMD ["/usr/bin/python","/tinyface/hr101_mxnet/tiny_detection_mxnet.py","/images"]
+
