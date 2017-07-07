@@ -38,7 +38,7 @@ nvidia-docker run -v /someDirWithimagefiles:/images vfs.tinyface_gpu
 ## Object detector 
 
 ## build the container
-Download to the vfsummary folder the [tar file](https://drive.google.com/open?id=0BzKzrI_SkD1_WVVTSmQxU0dVRzA) containing a pretrained Caffe model            
+Download to the ssd folder the [tar file](https://drive.google.com/open?id=0BzKzrI_SkD1_WVVTSmQxU0dVRzA) containing a pretrained Caffe model            
 docker build -f Dockerfile.ssd -t vfs.ssd .
 
 ## run the container
