@@ -98,6 +98,7 @@ def process_vid(filename):
                 currentUnknown += 1
                 current = people[name]
                 current['face_vec'] = face_encoding
+                current['video_name'] = filename
 
                 #print('name:',name)
                 #sys.stdout.flush()
