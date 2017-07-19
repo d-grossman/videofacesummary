@@ -11,14 +11,24 @@ import sys
 from face import face
 
 import cv2
-
+import hashlib
 import face_recognition_models
 
-def process_vid(filename):
+def process_vid(filename, reduceby, every):
     filename = filename.split('/')[-1]
     print('about to process:', filename)
     sys.stdout.flush()
     in_filename = join('/in',filename)
+
+    # Get MD5 hash of file
+    BLOCKSIZE = 65536
+    hasher = hashlib.md5()
+    with open(in_filename, 'rb') as afile:
+        buf = afile.read(BLOCKSIZE)
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = afile.read(BLOCKSIZE)
+    file_hash = hasher.hexdigest()
     
     camera = cv2.VideoCapture(in_filename)
     capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -31,9 +41,9 @@ def process_vid(filename):
 
     people = defaultdict(dict)
     currentUnknown = 0
-    every = 30 
+    #every = 30 
     frame = 0
-    reduceby = 4
+    #reduceby = 4
 
     keepGoing = True
     while keepGoing: 
@@ -99,6 +109,7 @@ def process_vid(filename):
                 current = people[name]
                 current['face_vec'] = face_encoding
                 current['video_name'] = filename
+                current['video_hash'] = file_hash
 
                 #print('name:',name)
                 #sys.stdout.flush()
@@ -131,8 +142,23 @@ def process_vid(filename):
     sys.stdout.flush()
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='Process video for faces')
+
+    # Required args
+    parser.add_argument("--reduceby",
+                        type=int,
+                        default=2,
+                        help="Factor by which to reduce video resolution to increase processing speed (ex: 1 = original resolution)")
+    parser.add_argument("--every",
+                        type=int,
+                        default=15,
+                        help="Analyze every nth frame (ex: 30 = process only every 30th frame of video")
+    args = parser.parse_args()
+    print("Reducing videos by %dx and Analyzing every %dth frame" % (args.reduceby,args.every))
+    sys.stdout.flush()
     files = glob.glob('/in/*')
     for f in files:
         ext = f.split('.')[-1]
         if ext in ['avi','mov','mp4']:
-            process_vid(f)
+            process_vid(f, args.reduceby, args.every)
