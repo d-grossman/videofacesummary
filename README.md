@@ -9,6 +9,13 @@ docker build -f Dockerfile.process -t vfs.process .
 ## run the container
 docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process
 
+## run the container with custom parameters
+docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process --reduceby 1 --every 30  
+
+reduceby = Factor to reduce video resolution (ex: 1 = original resolution)  
+
+every = Process every nth frame (ex: 30 = every 30th frame of video)
+
 # Jupyter container
 
 ## build the container
