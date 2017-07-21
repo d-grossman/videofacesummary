@@ -6,15 +6,25 @@ makes a summary of faces seen in a video
 ## build the container
 docker build -f Dockerfile.process -t vfs.process .
 
-## run the container
+## run the container to process videos with default parameters
 docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process
 
-## run the container with custom parameters
-docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process --reduceby 1 --every 30  
+## run the container to process videos with custom parameters
+docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process directFeatures.py --reduceby 1 --every 30 --tolerance 0.50 --jitters 4  
 
 reduceby = Factor to reduce video resolution (ex: 1 = original resolution)  
-
 every = Process every nth frame (ex: 30 = every 30th frame of video)
+tolerance = Different faces are tolerance apart (ex: 0.4->tight 0.6->loose)
+jitters = How many perturberations to use when making face vector
+
+## run the container to resolve processed video output from multiple videos
+docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process resolveVideos.py
+
+## run the container to resolve processed video output from multiple videos with customer parameters
+docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process resolveVideos.py --detected_faces_folder /out --reference_faces_file somefile.pkl
+
+detected_faces_folder = Folder containing detected faces pickles files (default:/out)  
+reference_faces_file = Pickle file in '/in' containing reference set of detected faces (default: face_reference_set.pkl)
 
 # Jupyter container
 
