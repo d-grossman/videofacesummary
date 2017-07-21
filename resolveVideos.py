@@ -25,7 +25,7 @@ def merge_face_to_reference(orig_key, orig_item, merge_key, merge_item):
     reference_face[orig_key] = orig_item
     return reference_face
 
-def main(detected_faces_folder,reference_faces_file):
+def main(detected_faces_folder,reference_faces_file, tolerance):
 
     in_reference_faces = os.path.join('/in',reference_faces_file.split('/')[-1])
 
@@ -62,10 +62,10 @@ def main(detected_faces_folder,reference_faces_file):
 
             # Look for duplicate faces in reference set
             for current_face_id in current_faces:
-                match = face.compare_faces(reference_vectors_only, current_faces[current_face_id]['face_vec'])
+                match = face.compare_faces(reference_vectors_only, current_faces[current_face_id]['face_vec'], tolerance)
                 match_indexes = [i for i, x in enumerate(match) if x == True]
 
-                # Merge single match into reference set
+                # Merge matches into reference set
                 # TODO - Should multiple reference face matches be averaged with the current face as a new reference entity?
                 for index in match_indexes:
                     key = reference_vectors_tuples[index][1]
@@ -100,5 +100,9 @@ if __name__ == '__main__':
                         type=str,
                         default="face_reference_set.pkl",
                         help="Pickle file of reference set for faces")
+    parser.add_argument("--tolerance",
+                        type=float,
+                        default=0.5,
+                        help="different faces are tolerance apart, 0.4->tight 0.6->loose")
     args = parser.parse_args()
-    main(args.detected_faces_folder, args.reference_faces_file)
+    main(args.detected_faces_folder, args.reference_faces_file, args.tolerance)
