@@ -61,5 +61,5 @@ RUN mkdir /out
 ADD . /prog
 WORKDIR /prog
 
-ENTRYPOINT ["/opt/conda/bin/python","./directFeatures.py"]
-CMD ["--reduceby","1.0","--every","10","--tolerance","0.50","--jitters","4"]
+ENTRYPOINT ["/opt/conda/bin/python"]
+CMD ["./directFeatures.py","--reduceby","1.0","--every","10","--tolerance","0.50","--jitters","4"]
