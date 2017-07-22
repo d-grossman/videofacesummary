@@ -284,6 +284,7 @@ def make_datastore(people,tasking=None):
     
     
     for p in people:
+        if not os.path.isdir("/in/tmp"): os.mkdir("/in/tmp")
         outfile_name = '/in/tmp/'+p+'.png'
         dat = people[p]['face_vec']
         COLOR.append('black')
