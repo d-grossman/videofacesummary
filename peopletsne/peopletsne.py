@@ -281,10 +281,9 @@ def make_datastore(people,tasking=None):
              'sandybrown', 'seagreen', 'seashell', 'sienna', 'silver', 'skyblue', 'slateblue', 
              'slategray', 'snow', 'springgreen', 'steelblue', 'tan', 'teal', 'thistle', 'tomato', 
              'turquoise', 'violet', 'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen']
-    
-    
+
+    if not os.path.isdir("/in/tmp"): os.mkdir("/in/tmp")
     for p in people:
-        if not os.path.isdir("/in/tmp"): os.mkdir("/in/tmp")
         outfile_name = '/in/tmp/'+p+'.png'
         dat = people[p]['face_vec']
         COLOR.append('black')
