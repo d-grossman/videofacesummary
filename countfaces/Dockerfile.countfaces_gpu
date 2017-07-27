@@ -11,5 +11,5 @@ RUN wget https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
 RUN pip install scipy matplotlib 
 RUN apt-get install -y python-tk python-opencv
 RUN python matconvnet_hr101_to_mxnet.py
-COPY tinyface/tiny_detection_mxnet_gpu.py /tinyface/tiny_detection_mxnet.py
-CMD ["/usr/bin/python","/tinyface/tiny_detection_mxnet.py","/images"]
+COPY tiny_detection_mxnet_gpu.py tiny_detection_mxnet.py
+CMD ["/usr/bin/python","/tinyface/hr101_mxnet/tiny_detection_mxnet.py","/images"]

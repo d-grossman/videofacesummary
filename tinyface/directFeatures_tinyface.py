@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 import cv2
 import hashlib
+from tinyface_face_extractor import extract_tinyfaces
 
 def file_digest(in_filename):
  # Get MD5 hash of file
@@ -72,7 +73,7 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
             cv2.rectangle(resized_image, (left, top),
                           (right, bottom), (255, 0, 0), 2)
 
-def process_vid(filename, reduceby, every, tolerance, jitters):
+def process_vid(filename, reduceby, every, tolerance, jitters, prob_thresh, nms_thresh, gpu):
 
     list_face_locations = []
 
@@ -85,6 +86,7 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
     capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
 
     progress = tqdm(total=capture_length)
+    progress.refresh()
 
     file_hash = file_digest(in_filename)
 
@@ -99,6 +101,7 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
             progress.update(1)
             progress.set_description('faces:{0} '.format(len(people)))
             progress.refresh()
+            sys.stderr.flush()
             frame_number += 1
             keep_going, img = camera.read()
             if img is None:
@@ -124,7 +127,9 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
                                    fx=1.0 / reduceby,
                                    fy=1.0 / reduceby)
 
-        list_face_locations = face.face_locations(resized_image)
+        # Use Tiny Face to identify candidate faces
+        list_face_locations = extract_tinyfaces(resized_image,prob_thresh,nms_thresh,gpu)
+        list_face_locations = [(int(x[1]), int(x[2]), int(x[3]), int(x[0])) for x in list_face_locations]
         list_face_encodings = face.face_encodings(resized_image, list_face_locations, jitters)
 
         match_to_faces(list_face_encodings, list_face_locations, people,
@@ -160,13 +165,26 @@ if __name__ == '__main__':
                         type=int,
                         default=1,
                         help="how many perturberations to use when making face vector")
+    parser.add_argument("--prob_thresh",
+                        type=float,
+                        default=0.5,
+                        help="Tiny Face Detector threshold for face likelihood")
+    parser.add_argument("--nms_thresh",
+                        type=float,
+                        default=0.1,
+                        help="Tiny Face Detector nms threshold for candidate face")
+    parser.add_argument("--gpu",
+                        type=bool,
+                        default=False,
+                        help="Flag to use GPU (note: Use nvidia-docker to run container")
 
     args = parser.parse_args()
     print("Reducing videos by {0}x and Analyzing every {1}th frame".format(args.reduceby, args.every))
+    sys.stdout.flush()
 
     files = glob.glob('/in/*')
     for f in files:
         ext = f.split('.')[-1]
         if ext in ['avi', 'mov', 'mp4']:
             process_vid(f, args.reduceby, args.every,
-                        args.tolerance, args.jitters)
+                        args.tolerance, args.jitters, args.prob_thresh, args.nms_thresh, args.gpu)

@@ -4,7 +4,6 @@
 
 import mxnet as mx
 import numpy as np
-#import matplotlib.pyplot as plt
 import cv2
 import scipy.io as sio
 import pylab as pl
@@ -51,6 +50,8 @@ def nms(dets, prob_thresh):
         order = order[inds + 1]  
     return keep
 
+
+
 def main(image_foldername):
 
 	# Thresholds to keep candidate face
@@ -88,7 +89,7 @@ def main(image_foldername):
 		sym, arg_params, aux_params = mx.model.load_checkpoint('hr101',0)
 		all_layers = sym.get_internals()
 
-		context=mx.cpu()
+		context=mx.gpu()
 
 		mod = mx.mod.Module(symbol=all_layers['fusex_output'], context=context, data_names=['data'], label_names=None)
 		mod.bind(for_training=False, data_shapes=[('data', (1, 3, 224, 224))], label_shapes=None, force_rebind=False)
@@ -176,6 +177,7 @@ if __name__ == '__main__':
                         help="Folder containing images to examine with Tiny Face Detector")
     args = parser.parse_args()
     main(args.image_foldername)						
+
 
 
 
