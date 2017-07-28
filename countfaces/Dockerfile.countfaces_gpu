@@ -1,0 +1,11 @@
+FROM mxnet/python:gpu
+RUN mkdir /tinyface
+WORKDIR /tinyface
+RUN git clone https://github.com/chinakook/hr101_mxnet.git
+WORKDIR /tinyface/hr101_mxnet
+RUN wget --quiet https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
+RUN pip install scipy matplotlib 
+RUN apt-get install -y python-tk python-opencv
+RUN python matconvnet_hr101_to_mxnet.py
+COPY tiny_detection_mxnet_gpu.py tiny_detection_mxnet.py
+CMD ["/usr/bin/python","tiny_detection_mxnet.py","/images"]

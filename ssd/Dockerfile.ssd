@@ -33,7 +33,7 @@ RUN git clone -b ${CLONE_TAG} --depth 1 https://github.com/weiliu89/caffe.git . 
     for req in $(cat python/requirements.txt) pydot; do pip install $req; done 
     
 # Fold in makefile.config fixes to run on cpu
-COPY ssd/Makefile.config.ssdfixes Makefile.config
+COPY Makefile.config.ssdfixes Makefile.config
 # Avoid 'cannot find -lopenblas' error
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends liblapack-dev liblapack3 libopenblas-base libopenblas-dev
@@ -51,10 +51,10 @@ RUN pip install -U setuptools
 RUN pip install IPython==5.0 jupyter
 
 # Fold in model downloaded locally from https://drive.google.com/open?id=0BzKzrI_SkD1_WVVTSmQxU0dVRzA
-COPY ssd/models_VGGNet_VOC0712_SSD_300x300.tar.gz models_VGGNet_VOC0712_SSD_300x300.tar.gz 
+COPY models_VGGNet_VOC0712_SSD_300x300.tar.gz models_VGGNet_VOC0712_SSD_300x300.tar.gz
 RUN tar -xvf models_VGGNet_VOC0712_SSD_300x300.tar.gz models/
 RUN rm models_VGGNet_VOC0712_SSD_300x300.tar.gz
-COPY ssd/ssd_detect.ipynb examples/ssd_detect.ipynb
+COPY ssd_detect.ipynb examples/ssd_detect.ipynb
 
 EXPOSE 8888
 CMD ["/usr/local/bin/jupyter","notebook","--allow-root","--port=8888","--ip=0.0.0.0","--no-browser"]

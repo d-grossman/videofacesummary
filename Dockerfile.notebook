@@ -62,7 +62,7 @@ RUN jupyter nbextension enable --py widgetsnbextension
 
 ADD . /prog
 WORKDIR /prog
-
+ENV PYTHONPATH=/prog:$PYTHONPATH
 EXPOSE 8888
 CMD ["/opt/conda/bin/jupyter","notebook","--allow-root","--port=8888","--ip=0.0.0.0","--no-browser","--NotebookApp.iopub_data_rate_limit=10000000000"]
 
