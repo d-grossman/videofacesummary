@@ -65,23 +65,14 @@ RUN conda install -c menpo dlib=19.4
 RUN pip install git+https://github.com/ageitgey/face_recognition_models
 RUN pip install scikit-image tqdm scipy matplotlib
 
-WORKDIR /downloads
+WORKDIR /
 RUN git clone https://github.com/chinakook/hr101_mxnet.git
-RUN wget --quiet https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
+RUN wget --quiet -P /hr101_mxnet/ https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
+WORKDIR /hr101_mxnet
+RUN python matconvnet_hr101_to_mxnet.py
 
 ADD . /prog
-WORKDIR /prog/tinyface
-RUN mv /downloads/hr_res101.mat /prog/tinyface/
-RUN grep -v "~/dev/tiny/trained_models/" /downloads/hr101_mxnet/matconvnet_hr101_to_mxnet.py > temp.py
-RUN echo "matpath='hr_res101.mat'" > temp2.py
-RUN cat temp2.py temp.py > matconvnet_hr101_to_mxnet.py
-RUN python /downloads/hr101_mxnet/matconvnet_hr101_to_mxnet.py
-RUN rm temp*.py && rm -r /downloads/
+RUN mv /hr101_mxnet/* /prog/tinyface/
 ENV PYTHONPATH=/prog:$PYTHONPATH
-WORKDIR /prog
-
-RUN pip install jupyter notebook bokeh sklearn
-RUN jupyter nbextension enable --py widgetsnbextension
-EXPOSE 8888
-CMD ["/opt/conda/bin/jupyter","notebook","--allow-root","--port=8888","--ip=0.0.0.0","--no-browser","--NotebookApp.iopub_data_rate_limit=10000000000"]
-
+WORKDIR /prog/tinyface
+CMD ["/opt/conda/bin/python","directFeatures_tinyface.py","--reduceby","1.0","--every","30","--tolerance","0.50","--jitters","4"]

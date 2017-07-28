@@ -18,7 +18,7 @@ docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process directFeatures.p
   * **jitters** = How many perturberations to use when making face vector
 
 ## run the container to resolve processed video output from multiple videos
-**(Note: This will try to process all pickle files in the "/out" volume by default)**
+**Note: This will try to process all pickle files in the "/out" volume by default**
 
 docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process resolveVideos.py
 
@@ -37,3 +37,25 @@ docker build -f Dockerfile.notebook -t vfs.notebook .
 
 ## run the container
 docker run -v /someDirWithdatafiles:/in -p8888:8888 vfs.notebook
+
+# *Video Processing container using Tiny Face*
+More about Tiny Face: [Site](https://www.cs.cmu.edu/~peiyunh/tiny/)
+[Paper](https://arxiv.org/pdf/1612.04402.pdf)
+[Repo](https://github.com/peiyunh/tiny)
+
+## build the container
+docker build -f tinyface/Dockerfile.tinyface -t vfs.tinyface .
+
+## run the container to process videos with default parameters
+docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.tinyface
+
+## run the container to process videos with custom parameters
+docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.tinyface tinyface/directFeatures_tinyface.py --**reduceby** 1.0
+        --**every** 30 --**tolerance** 0.50 --**jitters** 4  --**prob_thresh** 0.5 --**nms_thresh** 0.1 
+
+  * **reduceby** = Factor to reduce video resolution (ex: 1.0 = original resolution, 2.0 -> reduce horizontal and vertical resolution by 2)  
+  * **every** = Process every nth frame (ex: 30 = every 30th frame of video)
+  * **tolerance** = Different faces are tolerance apart (ex: 0.4->tight 0.6->loose)
+  * **jitters** = How many perturberations to use when making face vector
+  * **prob_thresh** = Tiny Face Detector threshold for face likelihood
+  * **nms_thresh** = Tiny Face Detector threshold for non-maximum suppression
