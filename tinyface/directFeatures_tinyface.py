@@ -179,7 +179,7 @@ if __name__ == '__main__':
                         help="Flag to use GPU (note: Use nvidia-docker to run container")
 
     args = parser.parse_args()
-    print("Reducing videos by {0}x and Analyzing every {1}th frame".format(args.reduceby, args.every))
+    print("Reducing videos by {0}x and Analyzing every {1} frames. Use GPU={2}.".format(args.reduceby,args.every,args.gpu))
     sys.stdout.flush()
 
     files = glob.glob('/in/*')
