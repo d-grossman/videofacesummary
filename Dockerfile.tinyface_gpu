@@ -1,0 +1,92 @@
+FROM nvidia/cuda:8.0-cudnn5-devel
+
+RUN apt-get update && \
+        apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        unzip \
+        yasm \
+        pkg-config \
+        libswscale-dev \
+        libtbb2 \
+        libtbb-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libjasper-dev \
+        libavformat-dev \
+        libpq-dev
+
+RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
+    libglib2.0-0 libxext6 libsm6 libxrender1 \
+    git mercurial subversion
+
+RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/anaconda.sh && \
+    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
+    rm ~/anaconda.sh
+
+ENV PATH /opt/conda/bin:$PATH
+
+RUN pip install numpy
+
+WORKDIR /
+RUN wget --quiet https://github.com/Itseez/opencv/archive/3.2.0.zip \
+&& unzip 3.2.0.zip \
+&& mkdir /opencv-3.2.0/cmake_binary \
+&& cd /opencv-3.2.0/cmake_binary \
+&& cmake -DBUILD_TIFF=ON \
+  -DBUILD_opencv_java=OFF \
+  -DWITH_CUDA=OFF \
+  -DENABLE_AVX=ON \
+  -DWITH_OPENGL=ON \
+  -DWITH_OPENCL=ON \
+  -DWITH_IPP=ON \
+  -DWITH_TBB=ON \
+  -DWITH_EIGEN=ON \
+  -DWITH_V4L=ON \
+  -DBUILD_TESTS=OFF \
+  -DBUILD_PERF_TESTS=OFF \
+  -DCMAKE_BUILD_TYPE=RELEASE \
+  -DCMAKE_INSTALL_PREFIX=$(python3.6 -c "import sys; print(sys.prefix)") \
+  -DPYTHON_EXECUTABLE=$(which python3.6) \
+  -DPYTHON_INCLUDE_DIR=$(python3.6 -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())") \
+  -DPYTHON_PACKAGES_PATH=$(python3.6 -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())") .. \
+&& make install \
+&& rm /3.2.0.zip \
+&& rm -r /opencv-3.2.0
+
+RUN apt-get install -y \
+        libatlas-base-dev \
+        libcurl4-openssl-dev \
+        libgtest-dev \
+        libopencv-dev \
+        python-opencv
+
+RUN cd /usr/src/gtest && cmake CMakeLists.txt && make && cp *.a /usr/lib
+WORKDIR /
+
+ENV BUILD_OPTS "USE_CUDA=1 USE_CUDA_PATH=/usr/local/cuda USE_CUDNN=1"
+RUN git clone --recursive https://github.com/dmlc/mxnet && cd mxnet && \
+    make -j$(nproc) $BUILD_OPTS
+
+ENV PYTHONPATH=/mxnet/python:$PYTHONPATH
+RUN pip install nose pylint numpy nose-timer requests
+RUN pip install flake8 pep8 --upgrade
+RUN conda install -c menpo dlib=19.4
+RUN pip install git+https://github.com/ageitgey/face_recognition_models
+RUN pip install scikit-image tqdm scipy matplotlib
+
+WORKDIR /
+RUN git clone https://github.com/chinakook/hr101_mxnet.git
+RUN wget --quiet -P /hr101_mxnet/ https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
+WORKDIR /hr101_mxnet
+RUN python matconvnet_hr101_to_mxnet.py
+
+ADD . /prog
+RUN mv /hr101_mxnet/* /prog/tinyface/
+ENV PYTHONPATH=/prog:$PYTHONPATH
+WORKDIR /prog/tinyface
+CMD ["/opt/conda/bin/python","directFeatures_tinyface.py","--gpu","True","--reduceby","1.0","--every","30","--tolerance","0.50","--jitters","4"]
