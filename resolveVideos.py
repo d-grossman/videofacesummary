@@ -27,7 +27,7 @@ def merge_face_to_reference(orig_key, orig_item, merge_key, merge_item):
 
 def main(detected_faces_folder,reference_faces_file, tolerance):
 
-    in_reference_faces = os.path.join('/in',reference_faces_file.split('/')[-1])
+    in_reference_faces = os.path.join('/reference', reference_faces_file.split('/')[-1])
 
     # Load reference set if available
     if os.path.isfile(in_reference_faces):
@@ -82,8 +82,8 @@ def main(detected_faces_folder,reference_faces_file, tolerance):
 
     # Summarize and save output
     print("Reviewed {0} faces and merged {1} duplicate faces".format(total_faces_reviewed, total_duplicates))
-    if not os.path.isdir("/out/reference"): os.mkdir("/out/reference")
-    out_reference_file = os.path.join('/out/reference/', reference_faces_file.split('/')[-1])
+    if not os.path.isdir("/reference"): os.mkdir("/reference")
+    out_reference_file = os.path.join('/reference/', reference_faces_file.split('/')[-1])
     print("Saving {0} faces as reference set to {1}".format(len(reference_faces), out_reference_file))
     pickle.dump(reference_faces, open(out_reference_file, "wb"))
 
@@ -95,11 +95,11 @@ if __name__ == '__main__':
     parser.add_argument("--detected_faces_folder",
                         type=str,
                        default="/out",
-                        help="Folder with pickle files of detected faces via directFeatures")
+                        help="Folder with pickle files of detected faces via directFeatures (default = /out)")
     parser.add_argument("--reference_faces_file",
                         type=str,
                         default="face_reference_set.pkl",
-                        help="Pickle file of reference set for faces")
+                        help="Pickle file of reference set for faces in /reference folder (default = face_reference_set.pkl)")
     parser.add_argument("--tolerance",
                         type=float,
                         default=0.5,
