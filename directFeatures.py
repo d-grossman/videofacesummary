@@ -24,8 +24,10 @@ def make_constants(filename, file_hash,  reduceby, tolerance, jitters):
     return (filename, file_hash, reduceby, tolerance, jitters)
 
 def match_to_faces(list_face_encodings, list_face_locations, people, resized_image, frame_number,  constants):
-    filename, file_hash, reduceby, tolerance, jitters = constants
+    filename, filecontent_hash, reduceby, tolerance, jitters = constants
     list_face_names = []
+    filename_hash = hashlib.md5(str(filename).encode('utf-8')).hexdigest()
+
     for face_encoding, face_location in zip(list_face_encodings, list_face_locations):
         name = ''
         exists = False
@@ -51,8 +53,8 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
             current = people[name]
             current['face_vec'] = face_encoding
             current['file_name'] = filename
-            current['file_name_hash'] = hashlib.md5(str(filename).encode('utf-8')).hexdigest()
-            current['file_content_hash'] = file_hash
+            current['file_name_hash'] = filename_hash
+            current['file_content_hash'] = filecontent_hash
 
             # Keeping sample frame for demo purposes instead of pulling the frame from disk
             # TODO - Resize frames that are larger than a given threshold

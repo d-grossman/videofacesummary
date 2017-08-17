@@ -47,7 +47,7 @@ def main(detected_faces_folder,reference_faces_file, hash_table_file, tolerance)
         print("No hash table pickle file found at {0}, starting with blank table".format(in_hash_table))
         hash_table = defaultdict(dict)
 
-    filtered_folder = [file for file in os.listdir(detected_faces_folder) if file[-20:] == "face_detected.pickle"]
+    filtered_folder = [file for file in os.listdir(detected_faces_folder) if file.endswith('face_detected.pickle')]
     total_faces_reviewed = 0
     total_duplicates = 0
 
