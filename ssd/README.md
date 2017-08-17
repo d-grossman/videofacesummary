@@ -12,6 +12,6 @@ Download to the ssd folder the [tar file](https://drive.google.com/open?id=0BzKz
 docker build -f Dockerfile.ssd -t vfs.ssd .
 
 ## run the container
-docker run -v /someDirWithimagefiles:/images  -p8888:8888 vfs.ssd
+docker run -v /someDirWithimagefiles:/images  -p 8888:8888 vfs.ssd
 
 Open Jupyter in your browser, navigate to the 'examples' folder and open ssd_detect.ipynb notebook
