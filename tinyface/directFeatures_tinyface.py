@@ -26,10 +26,8 @@ def make_constants(filename, file_hash,  reduceby, tolerance, jitters):
 
 def match_to_faces(list_face_encodings, list_face_locations, people, resized_image, frame_number,  constants):
     filename, file_hash, reduceby, tolerance, jitters = constants
-
+    list_face_names = []
     for face_encoding, face_location in zip(list_face_encodings, list_face_locations):
-
-        list_face_names = []
         name = ''
         exists = False
         next_unknown = len(people.keys())
@@ -53,11 +51,16 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
             next_unknown += 1
             current = people[name]
             current['face_vec'] = face_encoding
-            current['video_name'] = filename
-            current['video_hash'] = file_hash
+            current['file_name'] = filename
+            current['file_name_hash'] = hashlib.md5(str(filename).encode('utf-8')).hexdigest()
+            current['file_content_hash'] = file_hash
+
+            # Keeping sample frame for demo purposes instead of pulling the frame from disk
+            # TODO - Resize frames that are larger than a given threshold
+            current['frame_pic'] = resized_image
 
             (top, right, bottom, left) = face_location
-            current['pic'] = resized_image[top:bottom, left:right]
+            current['face_pic'] = resized_image[top:bottom, left:right]
             current['times'] = list()
 
             # correct to original resolution
@@ -70,16 +73,13 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
         list_face_names.append(name)
 
         for (top, right, bottom, left), name in zip(list_face_locations, list_face_names):
-            cv2.rectangle(resized_image, (left, top),
-                          (right, bottom), (255, 0, 0), 2)
+            cv2.rectangle(resized_image, (left-5, top-5),
+                          (right+5, bottom+5), (255, 0, 0), 2)
 
 def process_vid(filename, reduceby, every, tolerance, jitters, prob_thresh, nms_thresh, gpu):
 
-    list_face_locations = []
-
     frame_number = 0
     filename = filename.split('/')[-1]
-    print('About to process:', filename)
     in_filename = join('/in', filename)
 
     camera = cv2.VideoCapture(in_filename)
@@ -141,6 +141,36 @@ def process_vid(filename, reduceby, every, tolerance, jitters, prob_thresh, nms_
     pickle.dump(people, open(out_file, 'wb'))
     print('Wrote output to ' + out_file)
 
+def process_img(filename, reduceby, tolerance, jitters, prob_thresh, nms_thresh, gpu):
+
+    filename = filename.split('/')[-1]
+    in_filename = join('/in', filename)
+
+    file_hash = file_digest(in_filename)
+
+    constants = make_constants(filename, file_hash, reduceby, tolerance, jitters)
+
+    people = defaultdict(dict)
+
+    img = cv2.imread(in_filename)
+    resized_image = cv2.resize(img, (0, 0),
+                                   fx=1.0 / reduceby,
+                                   fy=1.0 / reduceby)
+
+    # Use Tiny Face to identify candidate faces
+    list_face_locations = extract_tinyfaces(resized_image, prob_thresh, nms_thresh, gpu)
+    list_face_locations = [(int(x[1]), int(x[2]), int(x[3]), int(x[0])) for x in list_face_locations]
+    list_face_encodings = face.face_encodings(resized_image, list_face_locations, jitters)
+
+    match_to_faces(list_face_encodings, list_face_locations, people,
+                       resized_image, -1, constants)
+
+    # finished processing file for faces, write out pickle
+    out_file = join('/out', '{0}.face_detected.pickle'.format(filename))
+    pickle.dump(people, open(out_file, 'wb'))
+    print('Wrote output to ' + out_file)
+    sys.stdout.flush()
+
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Process video for faces')
@@ -186,5 +216,9 @@ if __name__ == '__main__':
     for f in files:
         ext = f.split('.')[-1]
         if ext in ['avi', 'mov', 'mp4']:
+            print('Start processing video:', f.split('/')[-1])
             process_vid(f, args.reduceby, args.every,
                         args.tolerance, args.jitters, args.prob_thresh, args.nms_thresh, args.gpu)
+        elif ext in ['jpg', 'png', 'jpeg', 'bmp', 'gif']:
+            print('Start processing image:', f.split('/')[-1])
+            process_img(f, args.reduceby, args.tolerance, args.jitters, args.prob_thresh, args.nms_thresh, args.gpu)

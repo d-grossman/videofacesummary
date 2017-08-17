@@ -18,15 +18,16 @@ docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process directFeatures.p
   * **jitters** = How many perturberations to use when making face vector
 
 ## run the container to build a reference set of faces from processed videos
-**Note: This will try to process all pickle files in the "/out" volume by default and build a reference set of faces at /reference/face_reference_set.pkl**
+**Note: This will try to process all pickle files in the "/out" volume by default and build a reference set of faces at /reference/face_reference_set.pkl and a hash table of filenames and content hashes at /reference/hash_table.pkl**
 
 docker run -v /dirWithDetectedFaces:/out -v /referenceDir:/reference vfs.process resolveVideos.py
 
 ## run the container to resolve processed video output from multiple videos with custom parameters
-docker run -v /dirWithDetectedFaces:/out -v /referenceDir:/reference vfs.process resolveVideos.py --**detected_faces_folder** /out --**reference_faces_file** somefile.pkl --**tolerance** 0.50
+docker run -v /dirWithDetectedFaces:/out -v /referenceDir:/reference vfs.process resolveVideos.py --**detected_faces_folder** /out --**reference_faces_file** somefile.pkl --**hash_table_file** anotherfile.pkl --**tolerance** 0.50
 
   * **detected_faces_folder** = Folder containing detected faces pickles files (default:/out)  
   * **reference_faces_file** = Pickle file in '/reference' containing reference set of detected faces (default: face_reference_set.pkl)
+  * **hash_table_file** = Pickle file in '/reference' containing hash table of filenames and content hashes (default: hash_table.pkl)
   * **tolerance** = Different faces are tolerance apart (ex: 0.4->tight 0.6->loose)
 
 # *Jupyter container*
