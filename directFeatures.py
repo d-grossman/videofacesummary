@@ -9,6 +9,7 @@ from tqdm import tqdm
 import cv2
 import hashlib
 
+
 def file_digest(in_filename):
  # Get MD5 hash of file
     BLOCKSIZE = 65536
@@ -20,8 +21,10 @@ def file_digest(in_filename):
             buf = afile.read(BLOCKSIZE)
     return hasher.hexdigest()
 
+
 def make_constants(filename, file_hash,  reduceby, tolerance, jitters):
     return (filename, file_hash, reduceby, tolerance, jitters)
+
 
 def match_to_faces(list_face_encodings, list_face_locations, people, resized_image, frame_number,  constants):
     filename, filecontent_hash, reduceby, tolerance, jitters = constants
@@ -74,8 +77,9 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
         list_face_names.append(name)
 
         for (top, right, bottom, left), name in zip(list_face_locations, list_face_names):
-            cv2.rectangle(resized_image, (left-5, top-5),
-                          (right+5, bottom+5), (255, 0, 0), 2)
+            cv2.rectangle(resized_image, (left - 5, top - 5),
+                          (right + 5, bottom + 5), (255, 0, 0), 2)
+
 
 def process_vid(filename, reduceby, every, tolerance, jitters):
 
@@ -90,34 +94,48 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
 
     file_hash = file_digest(in_filename)
 
-    constants = make_constants(filename, file_hash, reduceby, tolerance, jitters)
+    constants = make_constants(
+        filename, file_hash, reduceby, tolerance, jitters)
 
     people = defaultdict(dict)
 
     keep_going = True
+    first = True
+
     while keep_going:
-        for _ in range(every):
-            # only face detect every once in a while
-            progress.update(1)
-            progress.set_description('faces:{0} '.format(len(people)))
-            progress.refresh()
-            frame_number += 1
-            keep_going, img = camera.read()
-            if img is None:
-                progress.close()
-                print('\nend of capture:IMG')
+
+        if not first:
+            if (every + frame_number) > capture_length:
                 keep_going = False
-                break
-            if frame_number > capture_length:
                 progress.close()
-                print('\nend of capture:Length')
-                keep_going = False
                 break
-            if not keep_going:
-                progress.close()
-                print('\nend of capture:keep_going')
-                keep_going = False
-                break
+            frame_number += every
+            camera.set(1, frame_number)
+            progress.update(every)
+        else:
+            first = False
+
+        keep_going, img = camera.read()
+
+        # only face detect every once in a while
+        progress.set_description('faces:{0} '.format(len(people)))
+        progress.refresh()
+
+        if img is None:
+            progress.close()
+            print('\nend of capture:IMG')
+            keep_going = False
+            break
+        if frame_number > capture_length:
+            progress.close()
+            print('\nend of capture:Length')
+            keep_going = False
+            break
+        if not keep_going:
+            progress.close()
+            print('\nend of capture:keep_going')
+            keep_going = False
+            break
 
         if not keep_going:
             progress.close()
@@ -128,11 +146,11 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
                                    fy=1.0 / reduceby)
 
         list_face_locations = face.face_locations(resized_image)
-        list_face_encodings = face.face_encodings(resized_image, list_face_locations, jitters)
+        list_face_encodings = face.face_encodings(
+            resized_image, list_face_locations, jitters)
 
         match_to_faces(list_face_encodings, list_face_locations, people,
                        resized_image, frame_number, constants)
-
 
     # finished processing file for faces, write out pickle
     out_file = join('/out', '{0}.face_detected.pickle'.format(filename))
@@ -141,6 +159,7 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
     print('Wrote output to ' + out_file)
     sys.stdout.flush()
 
+
 def process_img(filename, reduceby, tolerance, jitters):
 
     filename = filename.split('/')[-1]
@@ -148,20 +167,22 @@ def process_img(filename, reduceby, tolerance, jitters):
 
     file_hash = file_digest(in_filename)
 
-    constants = make_constants(filename, file_hash, reduceby, tolerance, jitters)
+    constants = make_constants(
+        filename, file_hash, reduceby, tolerance, jitters)
 
     people = defaultdict(dict)
 
     img = cv2.imread(in_filename)
     resized_image = cv2.resize(img, (0, 0),
-                                   fx=1.0 / reduceby,
-                                   fy=1.0 / reduceby)
+                               fx=1.0 / reduceby,
+                               fy=1.0 / reduceby)
 
     list_face_locations = face.face_locations(resized_image)
-    list_face_encodings = face.face_encodings(resized_image, list_face_locations, jitters)
+    list_face_encodings = face.face_encodings(
+        resized_image, list_face_locations, jitters)
 
     match_to_faces(list_face_encodings, list_face_locations, people,
-                       resized_image, -1, constants)
+                   resized_image, -1, constants)
 
     # finished processing file for faces, write out pickle
     out_file = join('/out', '{0}.face_detected.pickle'.format(filename))
@@ -195,7 +216,8 @@ if __name__ == '__main__':
                         help="how many perturberations to use when making face vector")
 
     args = parser.parse_args()
-    print("Reducing media by {0}x, Analyzing every {1}th frame of video, Face matching at tolerance {2}".format(args.reduceby, args.every, args.tolerance))
+    print("Reducing media by {0}x, Analyzing every {1}th frame of video, Face matching at tolerance {2}".format(
+        args.reduceby, args.every, args.tolerance))
 
     files = glob.glob('/in/*')
     for f in files:
