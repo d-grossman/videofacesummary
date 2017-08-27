@@ -46,11 +46,13 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
             current = people[person]
             facevec = current['face_vec']
             times = current['times']
-            match = face.compare_faces(facevec, face_encoding, tolerance)
-            #print('match',len(match),match,match[0])
-            #sys.stdout.flush()
-            #print('facevec',len(facevec),len(facevec[0]),facevec)
-            #sys.stdout.flush()
+            #match = face.compare_faces([facevec], face_encoding, tolerance)
+            match = face.compare_faces(
+                facevec, face_encoding, tolerance)  # normal
+            # print('match',len(match),match,match[0])
+            # sys.stdout.flush()
+            # print('facevec',len(facevec),len(facevec[0]),facevec)
+            # sys.stdout.flush()
 
             if match[0]:
                 exists = True
@@ -88,29 +90,32 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
             cv2.rectangle(resized_image, (left - 5, top - 5),
                           (right + 5, bottom + 5), (255, 0, 0), 2)
 
+
 def normalize_faces(pic, places, jitters):
     ret_val = list()
 
     for place in places:
-        top,right,bottom,left = place
-        landmarks = get_face_landmarks(face.pose_predictor, pic, dlib.rectangle(left,top,right,bottom))
-        adjusted_face = align_face_to_template(pic,landmarks,150) #TODO make sure that 150 is the right size..
-        #print('place',place)
-        #print('adjusted_face',adjusted_face.shape)
-        #sys.stdout.flush()
+        top, right, bottom, left = place
+        landmarks = get_face_landmarks(
+            face.pose_predictor, pic, dlib.rectangle(left, top, right, bottom))
+        # TODO make sure that 150 is the right size..
+        adjusted_face = align_face_to_template(pic, landmarks, 150)
+        # print('place',place)
+        # print('adjusted_face',adjusted_face.shape)
+        # sys.stdout.flush()
         #encoding = np.array(face.face_encodings( adjusted_face, [(0,0,150,150)], jitters) )
         #encoding = np.array(face.face_encodings( adjusted_face, [(150,150,0,0)], jitters) )
-        encoding = np.array(face.face_encodings( adjusted_face, [(0,150,150,0)], jitters) )
+        encoding = np.array(face.face_encodings(
+            adjusted_face, [(0, 150, 150, 0)], jitters))
         ret_val.append(encoding)
 
     return ret_val
-        
-
 
 
 def process_vid(filename, reduceby, every, tolerance, jitters):
 
     frame_number = 0
+    num_detections = 0
     filename = filename.split('/')[-1]
     in_filename = join('/in', filename)
 
@@ -145,7 +150,8 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
         keep_going, img = camera.read()
 
         # only face detect every once in a while
-        progress.set_description('faces:{0} '.format(len(people)))
+        progress.set_description(
+            'faces:{0} detections:{1}'.format(len(people), num_detections))
         progress.refresh()
 
         if img is None:
@@ -172,9 +178,11 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
                                    fx=1.0 / reduceby,
                                    fy=1.0 / reduceby)
 
-        list_face_locations = face.face_locations(resized_image)
-        list_face_encodings = normalize_faces(resized_image, list_face_locations,jitters)
+        list_face_locations = face.face_locations(resized_image, 2)
+        list_face_encodings = normalize_faces(
+            resized_image, list_face_locations, jitters)
 
+        num_detections += len(list_face_locations)
 
         #list_face_encodings = face.face_encodings( resized_image, list_face_locations, jitters)
 
@@ -206,7 +214,7 @@ def process_img(filename, reduceby, tolerance, jitters):
                                fx=1.0 / reduceby,
                                fy=1.0 / reduceby)
 
-    list_face_locations = face.face_locations(resized_image)
+    list_face_locations = face.face_locations(resized_image, 2)
     list_face_encodings = face.face_encodings(
         resized_image, list_face_locations, jitters)
 

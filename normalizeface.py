@@ -1,7 +1,8 @@
 import cv2
 import dlib
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+
 from face import face
 
 FACIAL_LANDMARKS_TEMPLATE = np.float32([
@@ -56,6 +57,8 @@ def get_face_landmarks(predictor, img, bb):
         predictor: dlibs.shape_predict(_FILE_)
         img: input image
         bb: bounding box containing the face
+    reminder dlib face_locations returns (top, right, bottom, left)
+             face template takes dlib.rectangle(left,top,right,bottom)
     """
     points = predictor(img, bb)
     return list(map(lambda p: (p.x, p.y), points.parts()))
@@ -69,6 +72,8 @@ def align_face_to_template(img, facial_landmarks, output_dim, landmarkIndices=OU
         img: src image to be aligned
         facial_landmarks: list of 68 landmarks (obtained from dlib)
         output_dim: image output dimension
+        reminder dlib face_locations returns (top, right, bottom, left)
+           face template takes dlib.rectangle(left, top, right, bottom)
     """
     np_landmarks = np.float32(facial_landmarks)
     np_landmarks_idx = np.array(landmarkIndices)
@@ -78,4 +83,3 @@ def align_face_to_template(img, facial_landmarks, output_dim, landmarkIndices=OU
     warped = cv2.warpAffine(img, H, (output_dim, output_dim))
 
     return warped
-
