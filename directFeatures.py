@@ -26,16 +26,23 @@ def file_digest(in_filename):
     return hasher.hexdigest()
 
 
-def make_constants(filename, file_hash,  reduceby, tolerance, jitters):
+def make_constants(filename, file_hash, reduceby, tolerance, jitters):
     return (filename, file_hash, reduceby, tolerance, jitters)
 
 
-def match_to_faces(list_face_encodings, list_face_locations, people, resized_image, frame_number,  constants):
+def match_to_faces(
+        list_face_encodings,
+        list_face_locations,
+        people,
+        resized_image,
+        frame_number,
+        constants):
     filename, filecontent_hash, reduceby, tolerance, jitters = constants
     list_face_names = []
     filename_hash = hashlib.md5(str(filename).encode('utf-8')).hexdigest()
 
-    for face_encoding, face_location in zip(list_face_encodings, list_face_locations):
+    for face_encoding, face_location in zip(
+            list_face_encodings, list_face_locations):
         name = ''
         exists = False
         next_unknown = len(people.keys())
@@ -86,7 +93,8 @@ def match_to_faces(list_face_encodings, list_face_locations, people, resized_ima
 
         list_face_names.append(name)
 
-        for (top, right, bottom, left), name in zip(list_face_locations, list_face_names):
+        for (top, right, bottom, left), name in zip(
+                list_face_locations, list_face_names):
             cv2.rectangle(resized_image, (left - 5, top - 5),
                           (right + 5, bottom + 5), (255, 0, 0), 2)
 
@@ -232,29 +240,36 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process video for faces')
 
     # Required args
-    parser.add_argument('--reduceby',
-                        type=float,
-                        default=2.0,
-                        help='Factor by which to reduce video resolution to increase processing speed (ex: 1 = original resolution)')
+    parser.add_argument(
+        '--reduceby',
+        type=float,
+        default=2.0,
+        help='Factor by which to reduce video resolution to increase processing speed (ex: 1 = original resolution)')
 
-    parser.add_argument('--every',
-                        type=int,
-                        default=15,
-                        help='Analyze every nth frame_number (ex: 30 = process only every 30th frame_number of video')
+    parser.add_argument(
+        '--every',
+        type=int,
+        default=15,
+        help='Analyze every nth frame_number (ex: 30 = process only every 30th frame_number of video')
 
-    parser.add_argument("--tolerance",
-                        type=float,
-                        default=0.5,
-                        help="different faces are tolerance apart, 0.4->tight 0.6->loose")
+    parser.add_argument(
+        "--tolerance",
+        type=float,
+        default=0.5,
+        help="different faces are tolerance apart, 0.4->tight 0.6->loose")
 
-    parser.add_argument("--jitters",
-                        type=int,
-                        default=1,
-                        help="how many perturberations to use when making face vector")
+    parser.add_argument(
+        "--jitters",
+        type=int,
+        default=1,
+        help="how many perturberations to use when making face vector")
 
     args = parser.parse_args()
-    print("Reducing media by {0}x, Analyzing every {1}th frame of video, Face matching at tolerance {2}".format(
-        args.reduceby, args.every, args.tolerance))
+    print(
+        "Reducing media by {0}x, Analyzing every {1}th frame of video, Face matching at tolerance {2}".format(
+            args.reduceby,
+            args.every,
+            args.tolerance))
 
     files = glob.glob('/in/*')
     for f in files:

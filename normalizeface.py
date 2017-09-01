@@ -64,7 +64,11 @@ def get_face_landmarks(predictor, img, bb):
     return list(map(lambda p: (p.x, p.y), points.parts()))
 
 
-def align_face_to_template(img, facial_landmarks, output_dim, landmarkIndices=OUTER_EYES_AND_NOSE):
+def align_face_to_template(
+        img,
+        facial_landmarks,
+        output_dim,
+        landmarkIndices=OUTER_EYES_AND_NOSE):
     """
     Aligns image by warping it to fit the landmarks on
     the image (src) to the landmarks on the template (dst)

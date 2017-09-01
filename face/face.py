@@ -40,7 +40,11 @@ def _trim_css_to_bounds(css, image_shape):
     :param image_shape: numpy shape of the image array
     :return: a trimmed plain tuple representation of the rect in (top, right, bottom, left) order
     """
-    return max(css[0], 0), min(css[1], image_shape[1]), min(css[2], image_shape[0]), max(css[3], 0)
+    return max(
+        css[0], 0), min(
+        css[1], image_shape[1]), min(
+            css[2], image_shape[0]), max(
+                css[3], 0)
 
 
 def face_distance(face_encodings, face_to_compare):
@@ -84,7 +88,12 @@ def face_locations(img, number_of_times_to_upsample=1):
     :param number_of_times_to_upsample: How many times to upsample the image looking for faces. Higher numbers find smaller faces.
     :return: A list of tuples of found face locations in css (top, right, bottom, left) order
     """
-    return [_trim_css_to_bounds(_rect_to_css(face), img.shape) for face in _raw_face_locations(img, number_of_times_to_upsample)]
+    return [
+        _trim_css_to_bounds(
+            _rect_to_css(face),
+            img.shape) for face in _raw_face_locations(
+            img,
+            number_of_times_to_upsample)]
 
 
 def _raw_face_landmarks(face_image, face_locations=None):
@@ -94,7 +103,8 @@ def _raw_face_landmarks(face_image, face_locations=None):
         face_locations = [_css_to_rect(face_location)
                           for face_location in face_locations]
 
-    return [pose_predictor(face_image, face_location) for face_location in face_locations]
+    return [pose_predictor(face_image, face_location)
+            for face_location in face_locations]
 
 
 def face_landmarks(face_image, face_locations=None):
@@ -108,7 +118,8 @@ def face_landmarks(face_image, face_locations=None):
     landmarks_as_tuples = [[(p.x, p.y) for p in landmark.parts()]
                            for landmark in landmarks]
 
-    # For a definition of each point index, see https://cdn-images-1.medium.com/max/1600/1*AbEg31EgkbXSQehuNJBlWg.png
+    # For a definition of each point index, see
+    # https://cdn-images-1.medium.com/max/1600/1*AbEg31EgkbXSQehuNJBlWg.png
     return [{
         "chin": points[0:17],
         "left_eyebrow": points[17:22],
@@ -132,7 +143,12 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
     """
     raw_landmarks = _raw_face_landmarks(face_image, known_face_locations)
 
-    return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters)) for raw_landmark_set in raw_landmarks]
+    return [
+        np.array(
+            face_encoder.compute_face_descriptor(
+                face_image,
+                raw_landmark_set,
+                num_jitters)) for raw_landmark_set in raw_landmarks]
 
 
 def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.4):
@@ -143,6 +159,7 @@ def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.4):
     :param tolerance: How much distance between faces to consider it a match. Lower is more strict. 0.6 is typical best performance.
     :return: A list of True/False values indicating which known_face_encodings match the face encoding to check
     """
-    return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
-
-
+    return list(
+        face_distance(
+            known_face_encodings,
+            face_encoding_to_check) <= tolerance)
