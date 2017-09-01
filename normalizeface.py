@@ -1,9 +1,6 @@
 import cv2
-import dlib
-import matplotlib.pyplot as plt
 import numpy as np
 
-from face import face
 
 FACIAL_LANDMARKS_TEMPLATE = np.float32([
     (0.0792396913815, 0.339223741112), (0.0829219487236, 0.456955367943),

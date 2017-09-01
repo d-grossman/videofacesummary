@@ -1,9 +1,5 @@
-import PIL
 import numpy as np
-import pickle
-import cv2
 import dlib
-import matplotlib.pyplot as plt
 import face_recognition_models
 
 

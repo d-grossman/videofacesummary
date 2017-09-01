@@ -1,17 +1,14 @@
 # coding: utf-8
 
 from __future__ import division, print_function
-from collections import namedtuple, defaultdict
-from bokeh.plotting import figure, output_notebook, output_file, show
-from ipywidgets import fixed, interact, interact_manual, interactive
+from collections import defaultdict
+from bokeh.plotting import figure, show
 from matplotlib import pyplot as plt
 from PIL import Image
 from sklearn.manifold import TSNE
 from face import face
-import face_recognition_models
 import pickle
 import cv2
-import ipywidgets as widgets
 import glob
 import os
 import numpy as np
