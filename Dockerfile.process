@@ -62,4 +62,4 @@ ADD . /prog
 WORKDIR /prog
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python"]
-CMD ["./directFeatures.py","--reduceby","1.0","--every","30","--tolerance","0.50","--jitters","4"]
+CMD ["./directFeatures.py","--reduceby","1.0","--every","30","--tolerance","0.50","--jitters","2"]
