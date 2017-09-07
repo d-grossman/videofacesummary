@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 import cv2
 import hashlib
+from helpers import file_digest
 
 
 def file_digest(in_filename):
