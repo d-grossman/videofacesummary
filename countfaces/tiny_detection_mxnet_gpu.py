@@ -70,9 +70,8 @@ def main(image_foldername):
     clusters_w = clusters[:, 2] - clusters[:, 0] + 1
     normal_idx = np.where(clusters[:, 4] == 1)
 
-    filtered_folder = [
-        pic_file for pic_file in os.listdir(image_foldername) if os.path.splitext(pic_file)[1] in [
-            '.png', '.jpg', '.jpeg', '.gif']]
+    filtered_folder = [pic_file for pic_file in os.listdir(
+        image_foldername) if os.path.splitext(pic_file)[1] in ['.png', '.jpg', '.jpeg', '.gif']]
     processed_folder = os.path.join(image_foldername, "processed")
     if not os.path.exists(processed_folder):
         os.mkdir(processed_folder)
