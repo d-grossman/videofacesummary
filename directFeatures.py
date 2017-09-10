@@ -14,7 +14,7 @@ from face import face
 from normalizeface import align_face_to_template, get_face_landmarks
 
 
-def pic2hash():
+def pic2hash(v):
     v_str = '{0}'.format(v)
     v_str = v_str.encode("utf")
     return hashlib.md5(v_str).hexdigest()
@@ -88,7 +88,7 @@ def match_to_faces(
 
             (top, right, bottom, left) = face_location
             current['face_pic'] = resized_image[top:bottom, left:right]
-            current['face_pic_hash'] = pic2hash(current[])
+            current['face_pic_hash'] = pic2hash(current['face_pic'])
             current['times'] = list()
 
             # correct to original resolution
