@@ -71,7 +71,7 @@ def main(image_foldername):
     normal_idx = np.where(clusters[:, 4] == 1)
 
     filtered_folder = [
-        file for file in os.listdir(image_foldername) if os.path.splitext(file)[1] in [
+        pic_file for pic_file in os.listdir(image_foldername) if os.path.splitext(pic_file)[1] in [
             '.png', '.jpg', '.jpeg', '.gif']]
     processed_folder = os.path.join(image_foldername, "processed")
     if not os.path.exists(processed_folder):
