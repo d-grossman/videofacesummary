@@ -89,4 +89,5 @@ ADD . /prog
 RUN mv /hr101_mxnet/* /prog/tinyface/
 ENV PYTHONPATH=/prog:$PYTHONPATH
 WORKDIR /prog/tinyface
-CMD ["/opt/conda/bin/python","directFeatures_tinyface.py","--gpu","True","--reduceby","1.0","--every","30","--tolerance","0.50","--jitters","4"]
+ENTRYPOINT ["/opt/conda/bin/python","directFeatures_tinyface.py"]
+CMD ["--gpu","True","--reduceby","1.0","--every","30","--tolerance","0.50","--jitters","4"]
