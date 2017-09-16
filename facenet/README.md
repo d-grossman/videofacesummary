@@ -24,8 +24,7 @@ docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.facenet --**reduceby** 1
   * **model** = When vectorizer=2, pretrained model to use. Download a Facenet Inception ResNet pretrained model [here](https://github.com/davidsandberg/facenet)*
  
 ## build the GPU container
-1. Edit line 40 of facenet/align.py and change 'USE_GPU = False' to 'USE_GPU = True'
-2. Run command: docker build -f Dockerfile.facenet_gpu -t vfs.facenet_gpu .
+docker build -f Dockerfile.facenet_gpu -t vfs.facenet_gpu .
 
 ## run the GPU container to process videos with default parameters
 nvidia-docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.facenet_gpu

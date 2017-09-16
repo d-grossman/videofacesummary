@@ -73,6 +73,8 @@ RUN mkdir /out
 
 ADD . /prog
 WORKDIR /prog/facenet
+# Set GPU flag in align.py to True for Tensorflow
+RUN sed -i 's/USE_GPU = False/USE_GPU = True/' align.py
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","directFeatures_facenet.py"]
 CMD ["--detector","1","--vectorizer","1"]
