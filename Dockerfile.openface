@@ -1,0 +1,55 @@
+FROM ubuntu:14.04
+
+RUN apt-get update && \
+        apt-get install -y \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        unzip \
+        yasm \
+        pkg-config \
+        libswscale-dev \
+        libtbb2 \
+        libtbb-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        libjasper-dev \
+        libavformat-dev \
+        libpq-dev
+
+RUN apt-get install -y libreadline-dev
+
+RUN wget --quiet https://raw.githubusercontent.com/torch/ezinstall/master/install-deps | bash -e
+
+RUN git clone https://github.com/torch/distro.git ~/torch --recursive
+RUN cd ~/torch; bash install-deps;
+WORKDIR /root/torch
+RUN ./install.sh
+WORKDIR /root/torch/install/bin
+RUN ./luarocks install nn && \
+    ./luarocks install dpnn && \
+    ./luarocks install image && \
+    ./luarocks install optim && \
+    ./luarocks install csvigo && \
+    ./luarocks install torchx && \
+    ./luarocks install tds
+
+RUN ln -s /root/torch/install/bin/* /usr/local/bin
+
+RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/anaconda.sh && \
+    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
+    rm ~/anaconda.sh
+ENV PATH /opt/conda/bin:$PATH
+
+RUN pip install numpy
+
+RUN conda install -c menpo dlib=19.4
+RUN pip install opencv-python
+
+ADD . /prog
+WORKDIR /prog/openface
+ENV PYTHONPATH=/prog:$PYTHONPATH
+ENTRYPOINT ["/opt/conda/bin/python","run_openface.py"]

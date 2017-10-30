@@ -1,4 +1,5 @@
 FROM continuumio/miniconda3
+MAINTAINER dgrossman <dgrossman@iqt.org>
 
 RUN apt-get update && \
         apt-get install -y \
@@ -22,7 +23,7 @@ RUN apt-get update && \
 RUN pip install numpy
 
 WORKDIR /
-RUN wget --quiet https://github.com/Itseez/opencv/archive/3.2.0.zip \
+RUN wget https://github.com/Itseez/opencv/archive/3.2.0.zip \
 && unzip 3.2.0.zip \
 && mkdir /opencv-3.2.0/cmake_binary \
 && cd /opencv-3.2.0/cmake_binary \
@@ -47,33 +48,15 @@ RUN wget --quiet https://github.com/Itseez/opencv/archive/3.2.0.zip \
 && rm /3.2.0.zip \
 && rm -r /opencv-3.2.0
 
-RUN apt-get install -y \
-        libatlas-base-dev \
-        libcurl4-openssl-dev \
-        libgtest-dev \
-        libopencv-dev \
-        python-opencv
-
-RUN cd /usr/src/gtest && cmake CMakeLists.txt && make && cp *.a /usr/lib
-WORKDIR /
-
-RUN git clone --recursive https://github.com/dmlc/mxnet && cd mxnet && make -j$(nproc) && rm -r build
-ENV PYTHONPATH=/mxnet/python:$PYTHONPATH
-RUN pip install nose pylint numpy nose-timer requests
 RUN pip install flake8 pep8 --upgrade
-#RUN conda install -c menpo dlib=19.4
-#RUN pip install git+https://github.com/ageitgey/face_recognition_models
-RUN pip install scikit-image tqdm scipy
+RUN conda install -c menpo dlib=19.4
 
-WORKDIR /
-RUN git clone https://github.com/chinakook/hr101_mxnet.git
-RUN wget --quiet -P /hr101_mxnet/ https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
-WORKDIR /hr101_mxnet
-RUN python matconvnet_hr101_to_mxnet.py
+RUN pip install git+https://github.com/ageitgey/face_recognition_models
+
+RUN pip install scikit-image jupyter notebook tqdm
 
 ADD . /prog
-RUN mv /hr101_mxnet/* /prog/tinyface/
+WORKDIR /prog/dlib_resnet50
 ENV PYTHONPATH=/prog:$PYTHONPATH
-WORKDIR /prog/tinyface
-ENTRYPOINT ["/opt/conda/bin/python","run_tinyface.py"]
-#CMD ["--reduceby","1.0","--every","30","--tolerance","0.50","--jitters","4"]
+ENTRYPOINT ["/opt/conda/bin/python","run_resnet50.py"]
+

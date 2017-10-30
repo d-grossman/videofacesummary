@@ -1,4 +1,4 @@
-FROM nvidia/cuda:8.0-cudnn5-devel
+FROM continuumio/miniconda3
 MAINTAINER dgrossman <dgrossman@iqt.org>
 
 RUN apt-get update && \
@@ -19,13 +19,6 @@ RUN apt-get update && \
         libjasper-dev \
         libavformat-dev \
         libpq-dev
-
-RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/anaconda.sh && \
-    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
-    rm ~/anaconda.sh
-
-ENV PATH /opt/conda/bin:$PATH
 
 RUN pip install numpy
 
@@ -62,20 +55,8 @@ RUN pip install git+https://github.com/ageitgey/face_recognition_models
 
 RUN pip install scikit-image jupyter notebook tqdm
 
-# Add Facenet dependencies
-RUN pip install scipy scikit-learn
-
-# Run on GPU
-RUN pip install tensorflow-gpu==1.2
-
-RUN mkdir /in
-RUN mkdir /out
-
 ADD . /prog
-WORKDIR /prog/facenet
-# Set GPU flag in align.py to True for Tensorflow
-RUN sed -i 's/USE_GPU = False/USE_GPU = True/' align.py
+WORKDIR /prog/dlib_resnet50
 ENV PYTHONPATH=/prog:$PYTHONPATH
-ENTRYPOINT ["/opt/conda/bin/python","directFeatures_facenet.py"]
-CMD ["--detector","1","--vectorizer","1"]
+ENTRYPOINT ["/opt/conda/bin/python","run_dlib.py"]
 

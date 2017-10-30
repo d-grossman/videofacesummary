@@ -24,39 +24,27 @@
 # SOFTWARE.
 
 import detect_face
-import tensorflow as tf
 import numpy as np
-import facenet
 import cv2
 
-# MTCNN minimum size of face in pixels
-minsize = 20
-# MTCNN probability threshold for three steps
-threshold = [0.85, 0.85, 0.85]
-# MTCNN scale factor
-factor = 0.709
+def prewhiten(x):
+    mean = np.mean(x)
+    std = np.std(x)
+    std_adj = np.maximum(std, 1.0/np.sqrt(x.size))
+    y = np.multiply(np.subtract(x, mean), 1/std_adj)
+    return y
 
-# Flag regarding use of GPU when loading tensorflow
-USE_GPU = False
-# Percentage of GPU memory to use
-gpu_memory_fraction = 0.8
-with tf.Graph().as_default():
-    # Load tensorflow session and mtcnn
-    if USE_GPU:
-        gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_memory_fraction)
-        sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, log_device_placement=False))
-    else:
-        sess = tf.Session()
-    with sess.as_default():
-        pnet, rnet, onet = detect_face.create_mtcnn(sess, None)
-
-def load_and_align_data(img, image_size=160, margin=10, detect_multiple_faces=True):
-
+def load_and_align_data(img, margin, minsize, threshold, factor, pnet, rnet, onet):
+    # Pretrained Facenet model we use expects 160x160
+    image_size = 160
+    # Allow MTCNN to detect multiple faces in one image
+    detect_multiple_faces = True
     # detect_face function expects RGB format
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     # Filter out any layers beyond first three (RGB)
     if img.shape[2] > 3:
         img = img[:, :, 0:3]
+
     img_size = np.asarray(img.shape)[0:2]
     bounding_boxes, _ = detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
     nrof_faces = bounding_boxes.shape[0]
@@ -90,7 +78,7 @@ def load_and_align_data(img, image_size=160, margin=10, detect_multiple_faces=Tr
             bb[3] = np.minimum(det[3] + margin / 2, img_size[0])
             cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]
             scaled = cv2.resize(cropped, (image_size, image_size), interpolation=cv2.INTER_LINEAR)
-            faces.append(facenet.prewhiten(scaled))
+            faces.append(prewhiten(scaled))
             bboxes.append((bb[1],bb[2],bb[3],bb[0]))
         return faces, bboxes
     else:
