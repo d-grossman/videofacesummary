@@ -49,11 +49,6 @@ RUN wget https://github.com/Itseez/opencv/archive/3.2.0.zip \
 && rm -r /opencv-3.2.0
 
 RUN pip install flake8 pep8 --upgrade
-RUN conda install -c menpo dlib=19.4
-
-RUN pip install git+https://github.com/ageitgey/face_recognition_models
-
-RUN pip install scikit-image jupyter notebook tqdm
 
 # Add Facenet dependencies
 RUN pip install scipy scikit-learn
@@ -61,12 +56,8 @@ RUN pip install scipy scikit-learn
 # Run on CPU
 RUN pip install tensorflow==1.2
 
-RUN mkdir /in
-RUN mkdir /out
-
 ADD . /prog
-WORKDIR /prog/facenet
+WORKDIR /prog/facenet_tf
 ENV PYTHONPATH=/prog:$PYTHONPATH
-ENTRYPOINT ["/opt/conda/bin/python","directFeatures_facenet.py"]
-CMD ["--detector","1","--vectorizer","1"]
+ENTRYPOINT ["/opt/conda/bin/python","run_facenet_tf.py"]
 
