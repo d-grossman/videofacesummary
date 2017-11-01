@@ -1,7 +1,30 @@
 # videofacesummary
-makes a summary of faces seen in a video
+makes a summary of faces seen in a video or image
+
+# *Face Detection and Chip Vectorization*
+
+The process to analyze a batch of media (videos or images) using this repository is:
+1. Select a face detection technique to run on the media
+2. Select a chip vectorization technique to run on the media
+3. (optional) Resolve the output into a reference set of unique faces and when/where they appeared
+
+## Face Detection Techniques
+1. dlib_detect - Based on the dlib library's facial landmarks models
+2. mtcnn_detect - Based on the Multi Task CNN algorithm
+3. tinyface_detect - Based on the TinyFace algorithm
+
+## Chip Vectorization Techniques
+1. resnet50_vector - Make vectors from chips using resnet50 model
+2. facenet_tf_vector - Make vectors from chips using the FaceNet algorithm via Tensorflow
+3. openface_vector - Make vectors from chips using the FaceNet algorithm via Torch
+
+Instructions for building and running the containers for each technique can be found in the associated repository folder 
+
+(optional) Resolving the output into a reference set of unique faces can be done by building the Dockerfile.process container and following the instructions below marked 'run the container to build a reference set of faces from processed media with custome parameters'.  
 
 # *Video Processing container*
+
+Dockerfile.process combines face detection (dlib) and chip vectorization (resnet50) components into one pipeline for ease of use. You may find better performance and accuracy on your media from using a different combination of the modular detection and vectorization techniques contained in the subfolders of this repository. 
 
 ## build the container
 
@@ -27,14 +50,15 @@ docker run -v /dirWith1movie:/in -v /outputDir:/out vfs.process directFeatures.p
   * **tolerance** = Different faces are tolerance apart (ex: 0.4->tight 0.6->loose)
   * **jitters** = How many perturberations to use when making face vector
 
-## run the container to build a reference set of faces from processed videos
+
+## run the container to build a reference set of faces from processed media 
 **Note: This will try to process all pickle files that were vectorized via resnet50 in the "/out" volume by default and build a reference set of faces at /reference/face_reference_set_resnet50.pkl and a hash table of filenames and content hashes at /reference/hash_table.pkl**
 
 ```Shell
 docker run -v /dirWithDetectedFaces:/out -v /referenceDir:/reference vfs.process resolveVideos.py
 ```
 
-## run the container to resolve processed video output from multiple videos with custom parameters
+## run the container to to build a reference set of faces from processed media with custom parameters
 ```Shell
 docker run -v /dirWithDetectedFaces:/out -v /referenceDir:/reference vfs.process resolveVideos.py 
              --vectors_used openface --detected_faces_folder /out --reference_faces_file face_reference_set_openface.pkl 
@@ -42,7 +66,7 @@ docker run -v /dirWithDetectedFaces:/out -v /referenceDir:/reference vfs.process
 ```
 
   * **vectors_used** = Vectorization technique used to generate pickle files (resnet50, facenet_tf, openface). Note that 
-          vector distance comparison between different vectorization techniques does not work. (default = resnet50)  
+          vector distance comparison between pickle files created with different vectorization techniques does not provide meaningful results. (default = resnet50)  
   * **detected_faces_folder** = Folder containing detected faces pickles files (default:/out)  
   * **reference_faces_file** = Pickle file in '/reference' containing reference set of detected faces (default: face_reference_set_resnet50.pkl)
   * **hash_table_file** = Pickle file in '/reference' containing hash table of filenames and content hashes (default: hash_table.pkl)
