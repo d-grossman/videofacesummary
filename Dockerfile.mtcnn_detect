@@ -48,15 +48,16 @@ RUN wget https://github.com/Itseez/opencv/archive/3.2.0.zip \
 && rm /3.2.0.zip \
 && rm -r /opencv-3.2.0
 
-RUN pip install flake8 pep8 --upgrade
-RUN conda install -c menpo dlib=19.4
+RUN pip install tqdm flake8 pep8 --upgrade
 
-RUN pip install git+https://github.com/ageitgey/face_recognition_models
+# Run on CPU
+RUN pip install tensorflow==1.2
 
-RUN pip install scikit-image jupyter notebook tqdm
+RUN mkdir /in
+RUN mkdir /out
 
 ADD . /prog
-WORKDIR /prog/dlib
+WORKDIR /prog/mtcnn_detect
 ENV PYTHONPATH=/prog:$PYTHONPATH
-ENTRYPOINT ["/opt/conda/bin/python","run_dlib.py"]
+ENTRYPOINT ["/opt/conda/bin/python","run_mtcnn.py"]
 

@@ -1,4 +1,5 @@
 FROM nvidia/cuda:8.0-cudnn5-devel
+MAINTAINER dgrossman <dgrossman@iqt.org>
 
 RUN apt-get update && \
         apt-get install -y \
@@ -19,10 +20,6 @@ RUN apt-get update && \
         libavformat-dev \
         libpq-dev
 
-RUN apt-get update --fix-missing && apt-get install -y wget bzip2 ca-certificates \
-    libglib2.0-0 libxext6 libsm6 libxrender1 \
-    git mercurial subversion
-
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/anaconda.sh && \
     /bin/bash ~/anaconda.sh -b -p /opt/conda && \
@@ -33,7 +30,7 @@ ENV PATH /opt/conda/bin:$PATH
 RUN pip install numpy
 
 WORKDIR /
-RUN wget --quiet https://github.com/Itseez/opencv/archive/3.2.0.zip \
+RUN wget https://github.com/Itseez/opencv/archive/3.2.0.zip \
 && unzip 3.2.0.zip \
 && mkdir /opencv-3.2.0/cmake_binary \
 && cd /opencv-3.2.0/cmake_binary \
@@ -58,36 +55,21 @@ RUN wget --quiet https://github.com/Itseez/opencv/archive/3.2.0.zip \
 && rm /3.2.0.zip \
 && rm -r /opencv-3.2.0
 
-RUN apt-get install -y \
-        libatlas-base-dev \
-        libcurl4-openssl-dev \
-        libgtest-dev \
-        libopencv-dev \
-        python-opencv
-
-RUN cd /usr/src/gtest && cmake CMakeLists.txt && make && cp *.a /usr/lib
-WORKDIR /
-
-ENV BUILD_OPTS "USE_CUDA=1 USE_CUDA_PATH=/usr/local/cuda USE_CUDNN=1"
-RUN git clone --recursive https://github.com/dmlc/mxnet && cd mxnet && \
-    make -j$(nproc) $BUILD_OPTS
-
-ENV PYTHONPATH=/mxnet/python:$PYTHONPATH
-RUN pip install nose pylint numpy nose-timer requests
 RUN pip install flake8 pep8 --upgrade
 #RUN conda install -c menpo dlib=19.4
 #RUN pip install git+https://github.com/ageitgey/face_recognition_models
-RUN pip install scikit-image tqdm scipy
+#RUN pip install scikit-image jupyter notebook tqdm
 
-WORKDIR /
-RUN git clone https://github.com/chinakook/hr101_mxnet.git
-RUN wget --quiet -P /hr101_mxnet/ https://www.cs.cmu.edu/~peiyunh/tiny/hr_res101.mat
-WORKDIR /hr101_mxnet
-RUN python matconvnet_hr101_to_mxnet.py
+# Add Facenet dependencies
+RUN pip install scipy scikit-learn
+
+# Run on GPU
+RUN pip install tensorflow-gpu==1.2
 
 ADD . /prog
-RUN mv /hr101_mxnet/* /prog/tinyface/
+WORKDIR /prog/facenet_tf_vector
+# Set GPU flag in align.py to True for Tensorflow
+#RUN sed -i 's/USE_GPU = False/USE_GPU = True/' align.py
 ENV PYTHONPATH=/prog:$PYTHONPATH
-WORKDIR /prog/tinyface
-ENTRYPOINT ["/opt/conda/bin/python","run_tinyface.py"]
-CMD ["--gpu","True"]
+ENTRYPOINT ["/opt/conda/bin/python","run_facenet_tf.py"]
+CMD ["--use_gpu","True"]

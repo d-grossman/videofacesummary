@@ -15,7 +15,7 @@ David Sandberg's GitHub [repository]() includes links to two different pretraine
 ## build the CPU container
 
 ```Shell
-docker build -f Dockerfile.facenet_tf -t vfs.facenet_tf .
+docker build -f Dockerfile.facenet_tf_vector -t vfs.facenet_tf_vector .
 ```
 
 Note: Run this command from the videofacesummary root folder
@@ -23,7 +23,7 @@ Note: Run this command from the videofacesummary root folder
 ## run the CPU container to vectorize face chips with default parameters
 ```Shell
 docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out 
-           -v ~/dirWithModels/:/models vfs.facenet_tf  
+           -v ~/dirWithModels/:/models vfs.facenet_tf_vector  
 ```
 
 Note: Replace ~/dirWithModels/ with the folder that contains the pretrained model folder 20170512-110547 from the first step.
@@ -31,7 +31,7 @@ Note: Replace ~/dirWithModels/ with the folder that contains the pretrained mode
 ## run the CPU container to vectorize face chips with custom parameters
 ```Shell
 docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out 
-           -v ~/dirWithModels/:/models vfs.facenet_tf  
+           -v ~/dirWithModels/:/models vfs.facenet_tf_vector  
            --tolerance 0.8 --chip_size 160 --verbose False --facenet_model /models/20170512-110547
  ```  
 
@@ -45,13 +45,13 @@ docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/out
 
 ## build the GPU container
 ```Shell
-docker build -f Dockerfile.facenet_tf_gpu -t vfs.facenet_tf_gpu .
+docker build -f Dockerfile.facenet_tf_gpu_vector -t vfs.facenet_tf_gpu_vector .
 ```
 
 ## run the GPU container to vectorize face chips with default parameters plus GPU support
 ```Shell
 nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out 
-                  -v ~/dirWithModels/:/models vfs.facenet_tf --use_gpu True
+                  -v ~/dirWithModels/:/models vfs.facenet_tf_gpu_vector 
 ```
 
 Note: Replace ~/dirWithModels/ with the folder that contains the pretrained model folder 20170512-110547 from the first step.
@@ -60,7 +60,7 @@ Note: Replace ~/dirWithModels/ with the folder that contains the pretrained mode
 ## run the GPU container to vectorize face chips with custom parameters
 ```Shell
 nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out 
-                  -v ~/dirWithModels/:/models vfs.facenet_tf --use_gpu True
+                  -v ~/dirWithModels/:/models vfs.facenet_tf_gpu_vector --use_gpu True
                   --gpu_memory_fraction 0.8 --tolerance 0.8 --chip_size 160  --verbose False 
                   --facenet_model /models/20170512-110547
 ```
