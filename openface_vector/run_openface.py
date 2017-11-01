@@ -157,10 +157,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     if not os.path.isfile(args.facenet_model):
-        print("Error - Required Torch model was not found. Please verify your Torch model is located at {0}".format(args.facenet_model)) 
+        print("Error - Required Torch model was not found. Please verify your Torch model is located at {0}".format(args.facenet_model))
         quit()
     elif not os.path.isfile(args.dlibFacePredictor):
-        print("Error - Required dlib landmark model was not found. Please verify your landmark model is located at {0}".format(args.dlibFacePredictor)) 
+        print("Error - Required dlib landmark model was not found. Please verify your landmark model is located at {0}".format(args.dlibFacePredictor))
         quit()
 
     print(
