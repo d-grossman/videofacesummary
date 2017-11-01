@@ -17,7 +17,7 @@ def get_cropped(filename, frame_number, box_list):
         cap.set(1, frame_number);
         ret, frame = cap.read()
         if ret:
-            cropped = [image[box[0]:box[2], box[3]:box[1]] for box in box_list]
+            cropped = [frame[box[0]:box[2], box[3]:box[1]] for box in box_list]
         else:
             print("Error with recalling frame {0} from video {1}".format(frame_number, filename))
 
