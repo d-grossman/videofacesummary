@@ -53,3 +53,4 @@ ADD . /prog
 WORKDIR /prog/openface_vector
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","run_openface.py"]
+CMD ["--use_gpu","True"]

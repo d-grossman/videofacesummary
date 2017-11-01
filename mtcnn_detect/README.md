@@ -47,7 +47,7 @@ Note: Run this command from the videofacesummary root folder
 
 ### run the GPU container to detect faces with default parameters
 ```Shell
-nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_gpu_detect --use_gpu True
+nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_gpu_detect 
 ```
 
 ### run the GPU container to detect faces with custom parameters

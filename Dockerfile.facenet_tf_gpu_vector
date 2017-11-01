@@ -72,3 +72,4 @@ WORKDIR /prog/facenet_tf_vector
 #RUN sed -i 's/USE_GPU = False/USE_GPU = True/' align.py
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","run_facenet_tf.py"]
+CMD ["--use_gpu","True"]

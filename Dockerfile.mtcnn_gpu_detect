@@ -67,4 +67,4 @@ ADD . /prog
 WORKDIR /prog/mtcnn_detect
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","run_mtcnn.py"]
-
+CMD ["--use_gpu","True"]

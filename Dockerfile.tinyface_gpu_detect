@@ -90,4 +90,4 @@ RUN mv /hr101_mxnet/* /prog/tinyface/
 ENV PYTHONPATH=/prog:$PYTHONPATH
 WORKDIR /prog/tinyface_detect
 ENTRYPOINT ["/opt/conda/bin/python","run_tinyface.py"]
-CMD ["--gpu","True"]
+CMD ["--use_gpu","True"]

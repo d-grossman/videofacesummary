@@ -51,7 +51,7 @@ docker build -f Dockerfile.facenet_tf_gpu_vector -t vfs.facenet_tf_gpu_vector .
 ## run the GPU container to vectorize face chips with default parameters plus GPU support
 ```Shell
 nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out 
-                  -v ~/dirWithModels/:/models vfs.facenet_tf_gpu_vector --use_gpu True
+                  -v ~/dirWithModels/:/models vfs.facenet_tf_gpu_vector 
 ```
 
 Note: Replace ~/dirWithModels/ with the folder that contains the pretrained model folder 20170512-110547 from the first step.

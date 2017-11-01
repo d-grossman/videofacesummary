@@ -46,7 +46,7 @@ Note: Run this command from the videofacesummary root folder
 ### run the GPU container to vectorize face chips with default parameters plus GPU support
 
 ```Shell
-nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface_gpu_vector --use_gpu True
+nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface_gpu_vector 
 ```
 
 ### run the GPU container to vectorize face chips with custom parameters plus GPU support
