@@ -8,7 +8,7 @@ import cv2
 import tensorflow as tf
 from time import time
 
-from facenet_tf import facenet
+from facenet_tf_vector import facenet
 from utils.get_md5 import file_digest
 from utils.prewhiten import prewhiten
 from utils.match_to_faces import match_to_faces, write_out_pickle

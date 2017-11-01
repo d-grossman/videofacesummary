@@ -15,6 +15,10 @@ docker build -f Dockerfile.openface_vector -t vfs.openface_vector .
 
 Note: Run this command from the videofacesummary root folder
 
+### download pretrained torch model and dlib's face landmark model
+
+Download the pretrained Torch model from Carnegie Mellon's openface project [here](https://storage.cmusatyalab.org/openface-models/nn4.small2.v1.t7). 
+
 ### run the CPU container to vectorize face chips with default parameters
 
 ```Shell
@@ -31,7 +35,7 @@ docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/out
   * **facenet_model** = Facenet pretrained model using Torch (default = /models/nn4.small2.v1.t7)
   * **dlibFacePredictor** = Dlib Face Landmarks file (default = /models/shape_predictor_68_face_landmarks.dat)
   * **tolerance** = Threshold for minimum vector distance between different faces, minimum value is 0.0 and maximum value is 4.0 (default = 0.8)")
-  * **chip_size** = Pretrained Facenet model from https://github.com/davidsandberg/facenet expects face chips of 160x160 (default = 160)")
+  * **chip_size** = Pretrained Facenet model from Carnegie Mellon expects face chips of 96x96 (default = 96)")
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)")
 
 
@@ -42,6 +46,10 @@ docker build -f Dockerfile.openface_gpu_vector -t vfs.openface_gpu_vector .
 ```
 
 Note: Run this command from the videofacesummary root folder
+
+### download pretrained torch model and dlib's face landmark model
+
+Download the pretrained Torch model from Carnegie Mellon's openface project [here](https://storage.cmusatyalab.org/openface-models/nn4.small2.v1.t7). 
 
 ### run the GPU container to vectorize face chips with default parameters plus GPU support
 
@@ -61,5 +69,5 @@ nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -
   * **use_gpu** = Use GPU, if available with nvidia-docker. (default = False)    
   * **gpu_memory_fraction** = If use_gpu is True, percentage of GPU memory to use. (default = 0.8)
   * **tolerance** = Threshold for minimum vector distance between different faces, minimum value is 0.0 and maximum value is 4.0 (default = 0.8)")
-  * **chip_size** = Pretrained Facenet model from https://github.com/davidsandberg/facenet expects face chips of 160x160 (default = 160)")
+  * **chip_size** = Pretrained Facenet model from Carnegie Mellon expects face chips of 96x96 (default = 96)")
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)")

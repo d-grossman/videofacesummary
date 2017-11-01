@@ -10,8 +10,8 @@ from time import time
 from utils.get_md5 import file_digest
 from utils.match_to_faces import match_to_faces, write_out_pickle
 from utils.get_cropped import get_cropped
-from openface.align_dlib import AlignDlib
-from openface.torch_neural_net import TorchNeuralNet
+from openface_vector.align_dlib import AlignDlib
+from openface_vector.torch_neural_net import TorchNeuralNet
 
 
 # Find face chips in images based on previously discovered bounding boxes
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--dlibFacePredictor',
         type=str,
-        default="/models/shape_predictor_68_face_landmarks.dat",
+        default="/opt/conda/lib/python3.6/site-packages/face_recognition_models/models/shape_predictor_68_face_landmarks.dat",
         help='dlib face landmark model for image alignment')
 
     parser.add_argument(
@@ -153,9 +153,11 @@ if __name__ == '__main__':
         help="Flag to print number of bounding boxes input and unique face vectors output per image")
 
     args = parser.parse_args()
-    if not os.path.isfile(args.facenet_model) or not os.path.isfile(args.dlibFacePredictor):
-        print("Error - One or both required models were not found. Please verify your Facenet model is located at {0} \
-              and your Dlib landmark model is located at {1}")
+    if not os.path.isfile(args.facenet_model):
+        print("Error - Required Torch model was not found. Please verify your Torch model is located at {0}".format(args.facenet_model)) 
+        quit()
+    elif not os.path.isfile(args.dlibFacePredictor):
+        print("Error - Required dlib landmark model was not found. Please verify your landmark model is located at {0}".format(args.dlibFacePredictor)) 
         quit()
 
     print(
