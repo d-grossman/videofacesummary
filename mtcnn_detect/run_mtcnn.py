@@ -6,7 +6,8 @@ import tensorflow as tf
 from tqdm import tqdm
 from time import time
 
-from mtcnn_detect import align, detect_face
+#from mtcnn_detect import align, detect_face
+import align, detect_face
 from utils.get_md5 import file_digest
 from utils.match_to_faces import write_out_pickle
 

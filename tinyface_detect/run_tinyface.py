@@ -5,7 +5,8 @@ import cv2
 from os.path import splitext, isdir
 from time import time
 
-from tinyface_detect.tinyface_face_extractor import extract_tinyfaces
+#from tinyface_detect.tinyface_face_extractor import extract_tinyfaces
+import extract_tinyfaces
 from utils.get_md5 import file_digest
 from utils.match_to_faces import write_out_pickle
 

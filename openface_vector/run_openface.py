@@ -10,8 +10,11 @@ from time import time
 from utils.get_md5 import file_digest
 from utils.match_to_faces import match_to_faces, write_out_pickle
 from utils.get_cropped import get_cropped
-from openface_vector.align_dlib import AlignDlib
-from openface_vector.torch_neural_net import TorchNeuralNet
+
+from align_dlib import AlignDlib
+from torch_neural_net import TorchNeuralNet
+#from openface_vector.align_dlib import AlignDlib
+#from openface_vector.torch_neural_net import TorchNeuralNet
 
 
 # Find face chips in images based on previously discovered bounding boxes
