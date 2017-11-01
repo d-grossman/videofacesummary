@@ -74,8 +74,9 @@ def main(jitters=1, tolerance=0.6, chip_size=160, verbose=False):
 
         # Verify original file exists on disk and has same content hash
         if os.path.isfile(file_with_path) and file_digest(file_with_path) == file_content_hash:
-            if len(bounding_boxes) > 0 and bounding_boxes[0][0] == -1:
-                if verbose:
+            if len(bounding_boxes) > 0:
+                # only allow verbose flag for images
+                if verbose and bounding_boxes[0][0] == -1:
                     start = time()
                     extract_chips(filename, bounding_boxes, chip_size, file_content_hash, tolerance, jitters, verbose)
                     duration = time() - start
