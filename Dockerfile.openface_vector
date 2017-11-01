@@ -1,4 +1,4 @@
-FROM nvidia/cuda:8.0-cudnn5-devel
+FROM ubuntu:14.04
 
 RUN apt-get update && \
         apt-get install -y \
@@ -50,6 +50,6 @@ RUN conda install -c menpo dlib=19.4
 RUN pip install opencv-python
 
 ADD . /prog
-WORKDIR /prog/openface
+WORKDIR /prog/openface_vector
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","run_openface.py"]

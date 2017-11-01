@@ -67,7 +67,7 @@ RUN pip install scipy scikit-learn
 RUN pip install tensorflow-gpu==1.2
 
 ADD . /prog
-WORKDIR /prog/facenet
+WORKDIR /prog/facenet_vector
 # Set GPU flag in align.py to True for Tensorflow
 #RUN sed -i 's/USE_GPU = False/USE_GPU = True/' align.py
 ENV PYTHONPATH=/prog:$PYTHONPATH

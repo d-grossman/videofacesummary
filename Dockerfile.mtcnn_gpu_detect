@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3
+FROM nvidia/cuda:8.0-cudnn5-devel
 MAINTAINER dgrossman <dgrossman@iqt.org>
 
 RUN apt-get update && \
@@ -19,6 +19,13 @@ RUN apt-get update && \
         libjasper-dev \
         libavformat-dev \
         libpq-dev
+
+RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/anaconda.sh && \
+    /bin/bash ~/anaconda.sh -b -p /opt/conda && \
+    rm ~/anaconda.sh
+
+ENV PATH /opt/conda/bin:$PATH
 
 RUN pip install numpy
 
@@ -50,14 +57,14 @@ RUN wget https://github.com/Itseez/opencv/archive/3.2.0.zip \
 
 RUN pip install tqdm flake8 pep8 --upgrade
 
-# Run on CPU
-RUN pip install tensorflow==1.2
+# Run on GPU
+RUN pip install tensorflow-gpu==1.2
 
 RUN mkdir /in
 RUN mkdir /out
 
 ADD . /prog
-WORKDIR /prog/mtcnn
+WORKDIR /prog/mtcnn_detect
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","run_mtcnn.py"]
 

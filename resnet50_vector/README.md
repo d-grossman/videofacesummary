@@ -9,7 +9,7 @@ This docker container uses resnet50 via dlib to vectorize face chips for each fi
 ## build the container
 
 ```Shell
-docker build -f Dockerfile.resnet50 -t vfs.resnet50 .
+docker build -f Dockerfile.resnet50_vector -t vfs.resnet50_vector .
 ```
 
 Note: Run this command from the videofacesummary root folder
@@ -17,13 +17,13 @@ Note: Run this command from the videofacesummary root folder
 ### run the container to vectorize face chips with default parameters
 
 ```Shell
-docker run -v ~/dirWithMedia:/media -v ~/dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out vfs.resnet50 
+docker run -v ~/dirWithMedia:/media -v ~/dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out vfs.resnet50_vector 
 ```
 
 ### run the container to vectorize face chips with custom parameters
 
 ```Shell
-docker run -v ~/dirWithMedia:/media -v ~/dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out vfs.resnet50 --jitters 1 
+docker run -v ~/dirWithMedia:/media -v ~/dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out vfs.resnet50_vector --jitters 1 
         --tolerance 0.6 --chip_size 160 --verbose False
 ```
 

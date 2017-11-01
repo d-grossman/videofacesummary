@@ -10,7 +10,7 @@ The output is a pickle file saved in the bboxes mounted volume for each image or
 ## build the CPU container
 
 ```Shell
-docker build -f Dockerfile.mtcnn -t vfs.mtcnn .
+docker build -f Dockerfile.mtcnn_detect -t vfs.mtcnn_detect .
 ```
 
 Note: Run this command from the videofacesummary root folder
@@ -18,13 +18,13 @@ Note: Run this command from the videofacesummary root folder
 ### run the CPU container to detect faces with default parameters
 
 ```Shell
-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn
+docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_detect
 ```
 
 ### run the CPU container to detect faces with custom parameters
 
 ```Shell
-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn --reduceby 1.0 --every 30 
+docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_detect --reduceby 1.0 --every 30 
            --threshold 0.85 --scale_factor 0.709  --margin 10 --min_size 40 --verbose False
 ```
 
@@ -40,21 +40,21 @@ docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn --reduceby 1.
 ## build the GPU container
 
 ```Shell
-docker build -f Dockerfile.mtcnn_gpu -t vfs.mtcnn_gpu .
+docker build -f Dockerfile.mtcnn_gpu_detect -t vfs.mtcnn_gpu_detect .
 ```
 
 Note: Run this command from the videofacesummary root folder
 
 ### run the GPU container to detect faces with default parameters
 ```Shell
-nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_gpu
+nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_gpu_detect --use_gpu True
 ```
 
 ### run the GPU container to detect faces with custom parameters
 ```Shell
-nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_gpu --reduceby 1.0 --every 30 
+nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_gpu_detect --use_gpu True --reduceby 1.0 --every 30 
                   --threshold 0.85 --scale_factor 0.709  --margin 10 --min_size 40 --verbose False
-                  --use_gpu True --gpu_memory_fraction 0.8 
+                  --gpu_memory_fraction 0.8 
 ```
 
   * **use_gpu** = Use GPU, if available with nvidia-docker. (default = False)   

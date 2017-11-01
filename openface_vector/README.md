@@ -10,7 +10,7 @@ The output is a pickle file saved in the 'out' mounted volume for each bounding 
 ## build the CPU container
 
 ```Shell
-docker build -f Dockerfile.openface -t vfs.openface .
+docker build -f Dockerfile.openface_vector -t vfs.openface_vector .
 ```
 
 Note: Run this command from the videofacesummary root folder
@@ -18,13 +18,13 @@ Note: Run this command from the videofacesummary root folder
 ### run the CPU container to vectorize face chips with default parameters
 
 ```Shell
-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface 
+docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface_vector 
 ```
 
 ### run the CPU container to vectorize face chips with custom parameters
 
 ```Shell
-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface  
+docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface_vector  
  --facenet_model /models/model_file/ --dlibFacePredictor /models/predictor_file --tolerance 0.8 --chip_size 160  --verbose False
 ```
 
@@ -38,7 +38,7 @@ docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/out
 ## build the GPU container
 
 ```Shell
-docker build -f Dockerfile.facenet_tf_gpu -t vfs.facenet_tf_gpu .
+docker build -f Dockerfile.openface_gpu_vector -t vfs.openface_gpu_vector .
 ```
 
 Note: Run this command from the videofacesummary root folder
@@ -46,12 +46,12 @@ Note: Run this command from the videofacesummary root folder
 ### run the GPU container to vectorize face chips with default parameters plus GPU support
 
 ```Shell
-nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface --use_gpu True
+nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface_gpu_vector --use_gpu True
 ```
 
 ### run the GPU container to vectorize face chips with custom parameters plus GPU support
 ```Shell
-nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface --use_gpu True
+nvidia-docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface_gpu_vector --use_gpu True
  --facenet_model /models/folderWithModel/ --dlibFacePredictor /models/model_file --tolerance** 0.8 --chip_size 160 --verbose False
  --gpu_memory_fraction 0.8  
 ```

@@ -9,7 +9,7 @@ This docker container uses dlib to detect faces for each video or image in a mou
 ## build the container
 
 ```Shell
-docker build -f Dockerfile.dlib -t vfs.dlib .
+docker build -f Dockerfile.dlib_detect -t vfs.dlib_detect .
 ```
 
 Note: Run this command from the videofacesummary root folder
@@ -17,13 +17,13 @@ Note: Run this command from the videofacesummary root folder
 ### run the CPU container to detect faces with default parameters
 
 ```Shell
-docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlib
+docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlibi_detect
 ```
 
 ### run the CPU container to detect faces with custom parameters
 
 ```Shell
-docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlib --reduceby 1.0 
+docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlib_detect --reduceby 1.0 
         --every 30 --upsampling 1 --verbose False
 ```
 

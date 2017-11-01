@@ -56,7 +56,7 @@ RUN pip install git+https://github.com/ageitgey/face_recognition_models
 RUN pip install scikit-image jupyter notebook tqdm
 
 ADD . /prog
-WORKDIR /prog/resnet50
+WORKDIR /prog/resnet50_vector
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","run_resnet50.py"]
 

@@ -9,19 +9,19 @@ The output is a pickle file saved in the bboxes mounted volume for each image or
 
 ## build the CPU container
 ```Shell
-docker build -f Dockerfile.tinyface -t vfs.tinyface .
+docker build -f Dockerfile.tinyface_detect -t vfs.tinyface_detect .
 ```
 
 Note: Run this command from the videofacesummary root folder
 
 ### run the CPU container to detect faces with default parameters
 ```Shell
-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface
+docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_detect
 ```
 
 ### run the CPU container to detect faces with custom parameters
 ```Shell
-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface --reduceby 1.0
+docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_detect --reduceby 1.0
         --every 30  --prob_thresh 0.7 --nms_thresh 0.1 --verbose False
 ```
 
@@ -34,19 +34,19 @@ docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface --reduceby
 
 ## build the GPU container
 ```Shell
-docker build -f Dockerfile.tinyface_gpu -t vfs.tinyface_gpu .
+docker build -f Dockerfile.tinyface_gpu_detect -t vfs.tinyface_gpu_detect .
 ```
 
 Note: Run this command from the videofacesummary root folder
 
 ### run the GPU container to detect faces with default parameters plus GPU support
 ```Shell
-nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_gpu --use_gpu True
+nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_gpu_detect --use_gpu True
 ```
 
 ### run the GPU container to detect faces with custom parameters
 ```Shell
-nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_gpu --use_gpu True --reduceby 1.0
+nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_gpu_detect --use_gpu True --reduceby 1.0
         --every 30 --prob_thresh 0.5 --nms_thresh 0.1 --verbose False
 ```
 
