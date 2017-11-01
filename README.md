@@ -8,19 +8,24 @@ The process to analyze a batch of media (videos or images) using this repository
 2. Select a chip vectorization technique to run on the media
 3. (optional) Resolve the output into a reference set of unique faces and when/where they appeared
 
+Instructions for building and running the containers for each technique can be found in the associated repository folder.
+
 ## Face Detection Techniques
 1. dlib_detect - Based on the dlib library's facial landmarks models
 2. mtcnn_detect - Based on the Multi Task CNN algorithm
 3. tinyface_detect - Based on the TinyFace algorithm
+
+Output of the Face Detection Techniques is a pickle file for each video or image. The pickle files contains a list of bounding boxes for detected faces found in the video or image.
 
 ## Chip Vectorization Techniques
 1. resnet50_vector - Make vectors from chips using resnet50 model
 2. facenet_tf_vector - Make vectors from chips using the FaceNet algorithm via Tensorflow
 3. openface_vector - Make vectors from chips using the FaceNet algorithm via Torch
 
-Instructions for building and running the containers for each technique can be found in the associated repository folder 
+Output of the Chip Vectorization Techniques is a pickle file for each video or image. The pickle file contains a dictionary of unique faces and when/where they appeared in the video or image.
 
-(optional) Resolving the output into a reference set of unique faces can be done by building the Dockerfile.process container and following the instructions below marked 'run the container to build a reference set of faces from processed media with custome parameters'.  
+## (optional) Create a Reference Set of Unique Faces
+Resolving the output into a reference set of unique faces can be done by building the Dockerfile.process container and following the instructions below marked 'run the container to build a reference set of faces from processed media with custom parameters'.  
 
 # *Video Processing container*
 
@@ -67,7 +72,7 @@ docker run -v /dirWithDetectedFaces:/out -v /referenceDir:/reference vfs.process
 
   * **vectors_used** = Vectorization technique used to generate pickle files (resnet50, facenet_tf, openface). Note that 
           vector distance comparison between pickle files created with different vectorization techniques does not provide meaningful results. (default = resnet50)  
-  * **detected_faces_folder** = Folder containing detected faces pickles files (default:/out)  
+  * **detected_faces_folder** = Folder containing 'detected_faces' pickles files (default:/out)  
   * **reference_faces_file** = Pickle file in '/reference' containing reference set of detected faces (default: face_reference_set_resnet50.pkl)
   * **hash_table_file** = Pickle file in '/reference' containing hash table of filenames and content hashes (default: hash_table.pkl)
   * **tolerance** = Different faces are tolerance apart (ex: 0.4->tight 0.6->loose)
