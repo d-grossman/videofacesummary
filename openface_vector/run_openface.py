@@ -89,8 +89,9 @@ def main(model, dlibFacePredictor, use_gpu=False, tolerance=0.6, chip_size=96, v
 
         # Verify original file exists on disk and has same content hash
         if os.path.isfile(file_with_path) and file_digest(file_with_path) == file_content_hash:
-            if len(bounding_boxes) > 0 and bounding_boxes[0][0] == -1:
-                if verbose:
+            if len(bounding_boxes) > 0:
+                # only allow verbose on images
+                if verbose and bounding_boxes[0][0] == -1:
                     start = time()
                     extract_chips(filename, bounding_boxes, chip_size, file_content_hash, tolerance,net,aligner, verbose)
                     duration = time() - start
