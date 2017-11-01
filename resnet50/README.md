@@ -17,13 +17,13 @@ Note: Run this command from the videofacesummary root folder
 ### run the container to vectorize face chips with default parameters
 
 ```Shell
-docker run -v ~/dirWithMedia:/media -v ~/dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out  vfs.resnet50 
+docker run -v ~/dirWithMedia:/media -v ~/dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out vfs.resnet50 
 ```
 
 ### run the container to vectorize face chips with custom parameters
 
 ```Shell
-docker run -v /dirWithMedia:/media -v /dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out vfs.resnet50 --jitters 1 
+docker run -v ~/dirWithMedia:/media -v ~/dirWithBoundingBoxes:/bboxes -v ~/outputDir:/out vfs.resnet50 --jitters 1 
         --tolerance 0.6 --chip_size 160 --verbose False
 ```
 

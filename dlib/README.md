@@ -17,13 +17,13 @@ Note: Run this command from the videofacesummary root folder
 ### run the CPU container to detect faces with default parameters
 
 ```Shell
-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.dlib
+docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlib
 ```
 
 ### run the CPU container to detect faces with custom parameters
 
 ```Shell
-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.dlib --reduceby 1.0 
+docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlib --reduceby 1.0 
         --every 30 --upsampling 1 --verbose False
 ```
 
