@@ -8,10 +8,6 @@ This docker container uses a Tensorflow implementation of Facenet to vectorize f
 The output is a pickle file saved in the 'out' mounted volume for each bounding box file found in the 'bboxes' volume. The pickle file contains a dictionary of unique faces, their associated vectors and locations in the original media files.
 
 
-## download pretrained model
-
-David Sandberg's GitHub [repository]() includes links to two different pretrained Tensorflow models based on Facenet. Our Docker container uses [20170512-110547](https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk) by default. Unzip the 20170512-110547 file after downloading it.
-
 ## build the CPU container
 
 ```Shell
@@ -19,6 +15,10 @@ docker build -f Dockerfile.facenet_tf_vector -t vfs.facenet_tf_vector .
 ```
 
 Note: Run this command from the videofacesummary root folder
+
+## download pretrained model
+
+David Sandberg's GitHub [repository](https://github.com/davidsandberg/facenet) includes links to two different pretrained Tensorflow models based on Facenet. Our Docker container expects [20170512-110547](https://drive.google.com/file/d/0B5MzpY9kBtDVZ2RpVDYwWmxoSUk) by default. Unzip the 20170512-110547 file after downloading it.
 
 ## run the CPU container to vectorize face chips with default parameters
 ```Shell
