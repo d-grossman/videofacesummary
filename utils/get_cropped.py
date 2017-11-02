@@ -14,7 +14,7 @@ def get_cropped(filename, frame_number, box_list):
     else:
         cropped = list()
         cap = cv2.VideoCapture(join('/media', filename))
-        cap.set(1, frame_number);
+        cap.set(1, frame_number)
         ret, frame = cap.read()
         if ret:
             cropped = [frame[box[0]:box[2], box[3]:box[1]] for box in box_list]
