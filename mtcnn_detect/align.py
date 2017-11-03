@@ -27,14 +27,24 @@ import detect_face
 import numpy as np
 import cv2
 
+
 def prewhiten(x):
     mean = np.mean(x)
     std = np.std(x)
-    std_adj = np.maximum(std, 1.0/np.sqrt(x.size))
-    y = np.multiply(np.subtract(x, mean), 1/std_adj)
+    std_adj = np.maximum(std, 1.0 / np.sqrt(x.size))
+    y = np.multiply(np.subtract(x, mean), 1 / std_adj)
     return y
 
-def load_and_align_data(img, margin, minsize, threshold, factor, pnet, rnet, onet):
+
+def load_and_align_data(
+        img,
+        margin,
+        minsize,
+        threshold,
+        factor,
+        pnet,
+        rnet,
+        onet):
     # Pretrained Facenet model we use expects 160x160
     image_size = 160
     # Allow MTCNN to detect multiple faces in one image
@@ -46,7 +56,8 @@ def load_and_align_data(img, margin, minsize, threshold, factor, pnet, rnet, one
         img = img[:, :, 0:3]
 
     img_size = np.asarray(img.shape)[0:2]
-    bounding_boxes, _ = detect_face.detect_face(img, minsize, pnet, rnet, onet, threshold, factor)
+    bounding_boxes, _ = detect_face.detect_face(
+        img, minsize, pnet, rnet, onet, threshold, factor)
     nrof_faces = bounding_boxes.shape[0]
     faces = list()
     bboxes = list()
@@ -59,12 +70,21 @@ def load_and_align_data(img, margin, minsize, threshold, factor, pnet, rnet, one
                 for i in range(nrof_faces):
                     det_arr.append(np.squeeze(det[i]))
             else:
-                bounding_box_size = (det[:, 2] - det[:, 0]) * (det[:, 3] - det[:, 1])
+                bounding_box_size = (
+                    det[:, 2] - det[:, 0]) * (det[:, 3] - det[:, 1])
                 img_center = img_size / 2
-                offsets = np.vstack(
-                    [(det[:, 0] + det[:, 2]) / 2 - img_center[1], (det[:, 1] + det[:, 3]) / 2 - img_center[0]])
+                offsets = np.vstack([(det[:, 0] +
+                                      det[:, 2]) /
+                                     2 -
+                                     img_center[1], (det[:, 1] +
+                                                     det[:, 3]) /
+                                     2 -
+                                     img_center[0]])
                 offset_dist_squared = np.sum(np.power(offsets, 2.0), 0)
-                index = np.argmax(bounding_box_size - offset_dist_squared * 2.0)  # some extra weight on the centering
+                index = np.argmax(
+                    bounding_box_size -
+                    offset_dist_squared *
+                    2.0)  # some extra weight on the centering
                 det_arr.append(det[index, :])
         else:
             det_arr.append(np.squeeze(det))
@@ -77,9 +97,10 @@ def load_and_align_data(img, margin, minsize, threshold, factor, pnet, rnet, one
             bb[2] = np.minimum(det[2] + margin / 2, img_size[1])
             bb[3] = np.minimum(det[3] + margin / 2, img_size[0])
             cropped = img[bb[1]:bb[3], bb[0]:bb[2], :]
-            scaled = cv2.resize(cropped, (image_size, image_size), interpolation=cv2.INTER_LINEAR)
+            scaled = cv2.resize(
+                cropped, (image_size, image_size), interpolation=cv2.INTER_LINEAR)
             faces.append(prewhiten(scaled))
-            bboxes.append((bb[1],bb[2],bb[3],bb[0]))
+            bboxes.append((bb[1], bb[2], bb[3], bb[0]))
         return faces, bboxes
     else:
         #print('Warning - No faces detected in image')
