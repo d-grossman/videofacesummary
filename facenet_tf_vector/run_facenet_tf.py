@@ -155,6 +155,11 @@ if __name__ == '__main__':
         help="Flag to print number of bounding boxes input and unique face vectors output per image")
 
     args = parser.parse_args()
+
+    if not os.path.isfile(args.facenet_model):
+        print("Error - Required Tensorflow model was not found. Please verify your Tensorflow model is located at {0}".format(args.facenet_model))
+        quit()
+
     print(
         "FacenetTF parameters set as: \n \
            Model = {0} \n \
