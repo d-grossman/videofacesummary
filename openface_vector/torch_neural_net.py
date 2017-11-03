@@ -77,13 +77,18 @@ class TorchNeuralNet:
         assert imgDim is not None
         assert cuda is not None
 
-        #self.cmd = ['/usr/bin/env', 'th', os.path.join(myDir, 'openface_server.lua'),
+        # self.cmd = ['/usr/bin/env', 'th', os.path.join(myDir, 'openface_server.lua'),
         #            '-model', model, '-imgDim', str(imgDim)]
         self.cmd = ['th', os.path.join(myDir, 'openface_server.lua'),
                     '-model', model, '-imgDim', str(imgDim)]
         if cuda:
             self.cmd.append('-cuda')
-        self.p = Popen(self.cmd, stdin=PIPE, stdout=PIPE, bufsize=0, universal_newlines=True)
+        self.p = Popen(
+            self.cmd,
+            stdin=PIPE,
+            stdout=PIPE,
+            bufsize=0,
+            universal_newlines=True)
 
         def exitHandler():
             if self.p.poll() is None:
@@ -102,7 +107,6 @@ class TorchNeuralNet:
         """
         if self.p.poll() is None:
             self.p.kill()
-
 
     def __del__(self):
         """

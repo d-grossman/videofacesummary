@@ -20,15 +20,35 @@ def process_image(image_file, reduceby, upsampling, verbose=False):
     frame_number = -1
 
     # Find bounding boxes for face chips in this image
-    face_locations, num_detections = identify_chips(image, frame_number, reduceby, upsampling)
+    face_locations, num_detections = identify_chips(
+        image, frame_number, reduceby, upsampling)
 
     # Only save pickle if faces were detected
     if num_detections > 0:
-        results = (filename, file_content_hash,[face_locations])
-        write_out_pickle(filename, results, "/bboxes","dlib","bboxes")
+        results = (filename, file_content_hash, [face_locations])
+        write_out_pickle(filename, results, "/bboxes", "dlib", "bboxes")
 
     if verbose:
         print("{0} face detections in {1}".format(num_detections, filename))
+
+# getframe
+
+
+def get_frame_inefficient(filename, frame_number):
+    camera = cv2.VideoCapture(filename)
+    camera.set(1, frame_number)
+    keep_going, image = camera.read()
+    camera.release()
+    return (keep_going, image)
+
+# get movie length
+
+
+def get_movie_length(filename):
+    camera = cv2.VideoCapture(filename)
+    ret_val = camera.get(cv2.CAP_PROP_FRAME_COUNT)
+    camera.release()
+    return ret_val
 
 
 # Process a video for faces
@@ -38,9 +58,11 @@ def process_video(image_file, reduceby, every, upsampling):
     num_detections = 0
     filename = image_file.split('/')[-1]
 
-    camera = cv2.VideoCapture(image_file)
+    #camera = cv2.VideoCapture(image_file)
+    #capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
 
-    capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
+    capture_length = get_movie_length(image_file)
+
     progress = tqdm(total=capture_length)
 
     file_content_hash = file_digest(image_file)
@@ -56,16 +78,20 @@ def process_video(image_file, reduceby, every, upsampling):
                 progress.close()
                 break
             frame_number += every
-            camera.set(1, frame_number)
+            #camera.set(1, frame_number)
             progress.update(every)
         else:
             first = False
 
-        keep_going, image = camera.read()
+        #keep_going, image = camera.read()
+        keep_going, image = get_frame_inefficient(image_file, frame_number)
 
         # only face detect every once in a while
         progress.set_description(
-            'Processing video: {0} detections: {1}'.format(filename[0:30]+"...", num_detections))
+            'Processing video: {0} detections: {1}'.format(
+                filename[
+                    0:30] + "...",
+                num_detections))
         progress.refresh()
 
         # verify that there is a video frame to process
@@ -86,7 +112,8 @@ def process_video(image_file, reduceby, every, upsampling):
             break
 
         # Find bounding boxes for face chips in this frame
-        face_locations, detections = identify_chips(image, frame_number, reduceby, upsampling)
+        face_locations, detections = identify_chips(
+            image, frame_number, reduceby, upsampling)
         if detections > 0:
             combined_face_locations += [face_locations]
             num_detections += detections
@@ -94,7 +121,7 @@ def process_video(image_file, reduceby, every, upsampling):
     # Only save pickle if faces were detected
     if num_detections > 0:
         results = (filename, file_content_hash, combined_face_locations)
-        write_out_pickle(filename, results, "/bboxes","dlib","bboxes")
+        write_out_pickle(filename, results, "/bboxes", "dlib", "bboxes")
 
 
 # Detect faces and vectorize chips based on input parameters
@@ -109,10 +136,10 @@ def identify_chips(image, frame_number, reduceby, upsampling):
 
     # Align face locations with original image
     transformed_face_locations = [[int(face_location[0] * reduceby),
-                         int(face_location[1] * reduceby),
-                         int(face_location[2] * reduceby),
-                         int(face_location[3] * reduceby)]
-                         for face_location in list_face_locations]
+                                   int(face_location[1] * reduceby),
+                                   int(face_location[2] * reduceby),
+                                   int(face_location[3] * reduceby)]
+                                  for face_location in list_face_locations]
 
     frame_with_face_locations = (frame_number, transformed_face_locations)
 
@@ -142,7 +169,8 @@ def main(reduceby=1, every=30, upsampling=1, verbose=False):
                 process_image(f, reduceby, upsampling, verbose)
                 duration = time() - start
                 durations.append(duration)
-                print("{0} seconds to process {1}\n".format('%.3f' % duration, f.split('/')[-1]))
+                print("{0} seconds to process {1}\n".format(
+                    '%.3f' % duration, f.split('/')[-1]))
             else:
                 process_image(f, reduceby, upsampling)
 
@@ -151,15 +179,18 @@ def main(reduceby=1, every=30, upsampling=1, verbose=False):
 
     final = time()
 
-    if verbose and len(durations)>0:
-        average = sum(durations)/len(durations)
-        print("\nAverage elapsed time to detect faces in images = {0}".format('%.3f' % average))
-        print("Total time to detect faces in {0} images = {1}".format(len(durations), '%.3f' % (final - kickoff)))
+    if verbose and len(durations) > 0:
+        average = sum(durations) / len(durations)
+        print("\nAverage elapsed time to detect faces in images = {0}".format(
+            '%.3f' % average))
+        print("Total time to detect faces in {0} images = {1}".format(
+            len(durations), '%.3f' % (final - kickoff)))
 
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description='Identify bounding boxes for faces in video and images using dlib')
+    parser = argparse.ArgumentParser(
+        description='Identify bounding boxes for faces in video and images using dlib')
 
     parser.add_argument(
         '--reduceby',
@@ -191,12 +222,12 @@ if __name__ == '__main__':
            Media reduced by {0}x \n \
            Analyzing every {1}th frame of video \n \
            Upsampling = {2} \n \
-           Verbose =  {3} \n" \
-           .format(
-           args.reduceby,
-           args.every,
-           args.upsampling,
-           args.verbose))
+           Verbose =  {3} \n"
+        .format(
+            args.reduceby,
+            args.every,
+            args.upsampling,
+            args.verbose))
 
     sys.stdout.flush()
     sys.stderr.flush()

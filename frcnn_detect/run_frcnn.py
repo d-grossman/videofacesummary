@@ -26,28 +26,48 @@ def process_image(image_file, threshold, nms, reduceby, net, verbose=False):
     frame_number = -1
 
     # Find bounding boxes for face chips in this image
-    face_locations, num_detections = identify_chips(image, frame_number, threshold,
-                                         nms, reduceby, net)
+    face_locations, num_detections = identify_chips(
+        image, frame_number, threshold, nms, reduceby, net)
 
     # Only save pickle if faces were detected
     if num_detections > 0:
-        results = (filename, file_content_hash,[face_locations])
-        write_out_pickle(filename, results, "/bboxes","frcnn","bboxes")
+        results = (filename, file_content_hash, [face_locations])
+        write_out_pickle(filename, results, "/bboxes", "frcnn", "bboxes")
 
     if verbose:
         print("{0} face detections in {1}".format(num_detections, filename))
 
 
+# getframe
+def get_frame_inefficient(filename, frame_number):
+    camera = cv2.VideoCapture(filename)
+    camera.set(1, frame_number)
+    keep_going, image = camera.read()
+    camera.release()
+    return (keep_going, image)
+
+# get movie length
+
+
+def get_movie_length(filename):
+    camera = cv2.VideoCapture(filename)
+    ret_val = camera.get(cv2.CAP_PROP_FRAME_COUNT)
+    camera.release()
+    return ret_val
+
 # Process a video for faces
+
+
 def process_video(image_file, threshold, nms, reduceby, net, every):
 
     frame_number = 0
     num_detections = 0
     filename = image_file.split('/')[-1]
 
-    camera = cv2.VideoCapture(image_file)
+    #camera = cv2.VideoCapture(image_file)
 
-    capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
+    #capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
+    capture_length = get_movie_length(image_file)
     progress = tqdm(total=capture_length)
 
     file_content_hash = file_digest(image_file)
@@ -63,16 +83,20 @@ def process_video(image_file, threshold, nms, reduceby, net, every):
                 progress.close()
                 break
             frame_number += every
-            camera.set(1, frame_number)
+            #camera.set(1, frame_number)
             progress.update(every)
         else:
             first = False
 
-        keep_going, image = camera.read()
+        #keep_going, image = camera.read()
+        keep_going, image = get_frame_inefficient(image_file, frame_number)
 
         # only face detect every once in a while
         progress.set_description(
-            'Processing video: {0} detections: {1}'.format(filename[0:30]+"...", num_detections))
+            'Processing video: {0} detections: {1}'.format(
+                filename[
+                    0:30] + "...",
+                num_detections))
         progress.refresh()
 
         # verify that there is a video frame to process
@@ -93,8 +117,8 @@ def process_video(image_file, threshold, nms, reduceby, net, every):
             break
 
         # Find bounding boxes for face chips in this frame
-        face_locations, detections = identify_chips(image, frame_number, threshold,
-                                                   nms, reduceby, net)
+        face_locations, detections = identify_chips(
+            image, frame_number, threshold, nms, reduceby, net)
         if detections > 0:
             combined_face_locations += [face_locations]
             num_detections += detections
@@ -102,7 +126,7 @@ def process_video(image_file, threshold, nms, reduceby, net, every):
     # Only save pickle if faces were detected
     if num_detections > 0:
         results = (filename, file_content_hash, combined_face_locations)
-        write_out_pickle(filename, results, "/bboxes","frcnn","bboxes")
+        write_out_pickle(filename, results, "/bboxes", "frcnn", "bboxes")
 
 
 # Detect faces and vectorize chips based on input parameters
@@ -118,10 +142,10 @@ def identify_chips(image, frame_number, threshold, nms_thresh, reduceby, net):
     scores, boxes = im_detect(net, resized_image)
 
     cls_ind = 1
-    cls_boxes = boxes[:, 4*cls_ind:4*(cls_ind + 1)]
+    cls_boxes = boxes[:, 4 * cls_ind:4 * (cls_ind + 1)]
     cls_scores = scores[:, cls_ind]
     dets = np.hstack((cls_boxes,
-            cls_scores[:, np.newaxis])).astype(np.float32)
+                      cls_scores[:, np.newaxis])).astype(np.float32)
     keep = nms(dets, nms_thresh)
     dets = dets[keep, :]
 
@@ -134,22 +158,31 @@ def identify_chips(image, frame_number, threshold, nms_thresh, reduceby, net):
 
     dets[:, 2] = dets[:, 2]
     dets[:, 3] = dets[:, 3]
-   
-    #list_face_locations = [(dets[j,0], dets[j, 1], dets[j, 2], dets[j, 3], dets[j, 4])    
+
+    # list_face_locations = [(dets[j,0], dets[j, 1], dets[j, 2], dets[j, 3],
+    # dets[j, 4])
 
     # Align face locations with original image
     transformed_face_locations = [[int(dets[j, 1] * reduceby),
-                         int(dets[j, 2] * reduceby),
-                         int(dets[j, 3] * reduceby),
-                         int(dets[j, 0] * reduceby)]
-                         for j in xrange(dets.shape[0])]
+                                   int(dets[j, 2] * reduceby),
+                                   int(dets[j, 3] * reduceby),
+                                   int(dets[j, 0] * reduceby)]
+                                  for j in xrange(dets.shape[0])]
 
     frame_with_face_locations = (frame_number, transformed_face_locations)
 
     return frame_with_face_locations, len(transformed_face_locations)
 
 
-def main(use_gpu, caffe_model, prototxt_file, threshold=0.85, nms=0.15, reduceby=1, every=30, verbose=False): 
+def main(
+        use_gpu,
+        caffe_model,
+        prototxt_file,
+        threshold=0.85,
+        nms=0.15,
+        reduceby=1,
+        every=30,
+        verbose=False):
 
     # Look for files at /media folder
     files = [item for item in glob.glob('/media/*') if not isdir(item)]
@@ -163,7 +196,7 @@ def main(use_gpu, caffe_model, prototxt_file, threshold=0.85, nms=0.15, reduceby
     if use_gpu:
         caffe.set_mode_gpu()
         caffe.set_device(0)
-        cfg.GPU_ID = 0 
+        cfg.GPU_ID = 0
     else:
         caffe.set_mode_cpu()
 
@@ -172,37 +205,45 @@ def main(use_gpu, caffe_model, prototxt_file, threshold=0.85, nms=0.15, reduceby
     #net = caffe.Net(prototxt_file, caffe.TEST, "weights="+caffe_model)
 
     for f in files:
-            ext = splitext(f)[1]
+        ext = splitext(f)[1]
 
-            # videos
-            if ext in ['.avi', '.mov', '.mp4']:
-                process_video(f, threshold, nms, reduceby, net, every)
+        # videos
+        if ext in ['.avi', '.mov', '.mp4']:
+            process_video(f, threshold, nms, reduceby, net, every)
 
-            # images
-            elif ext in ['.jpg', '.png', '.jpeg', '.bmp', '.gif']:
-                if verbose:
-                    start = time()
-                    process_image(f, threshold, nms, reduceby, net, verbose)
-                    duration = time() - start
-                    durations.append(duration)
-                    print("{0} seconds to process {1}\n".format('%.3f' % duration, f.split('/')[-1]))
-                else:
-                    process_image(f, threshold, nms, reduceby, net)
+        # images
+        elif ext in ['.jpg', '.png', '.jpeg', '.bmp', '.gif']:
+            if verbose:
+                start = time()
+                process_image(f, threshold, nms, reduceby, net, verbose)
+                duration = time() - start
+                durations.append(duration)
+                print("{0} seconds to process {1}\n".format(
+                    '%.3f' % duration, f.split('/')[-1]))
+            else:
+                process_image(f, threshold, nms, reduceby, net)
 
-            sys.stdout.flush()
-            sys.stderr.flush()
+        sys.stdout.flush()
+        sys.stderr.flush()
 
     final = time()
 
-    if verbose and len(durations)>0:
-        average = sum(durations)/len(durations)
-        print("\nAverage elapsed time to detect faces in images = {0}".format('%.3f' % average))
-        print("Total time to detect faces in {0} images = {1}".format(len(durations), '%.3f' % (final - kickoff)))
+    if verbose and len(durations) > 0:
+        average = sum(durations) / len(durations)
+        print(
+            "\nAverage elapsed time to detect faces in images = {0}".format(
+                '%.3f' %
+                average))
+        print(
+            "Total time to detect faces in {0} images = {1}".format(
+                len(durations), '%.3f' %
+                (final - kickoff)))
 
 
 if __name__ == '__main__':
     import argparse
-    parser = argparse.ArgumentParser(description='Identify bounding boxes for faces in video and images using Faster-RCNN')
+    parser = argparse.ArgumentParser(
+        description='Identify bounding boxes for faces in video and images using Faster-RCNN')
 
     # Optional args
     parser.add_argument(
@@ -263,20 +304,28 @@ if __name__ == '__main__':
            NMS = {4} \n \
            Media reduced by {5}x \n \
            Analyzing every {6}th frame of video \n \
-           Verbose = {7} \n" \
-           .format(
-           args.use_gpu,
-           args.caffe_model, 
-           args.prototxt_file,
-           args.threshold,
-           args.nms,
-           args.reduceby,
-           args.every,
-           args.verbose))
+           Verbose = {7} \n"
+        .format(
+            args.use_gpu,
+            args.caffe_model,
+            args.prototxt_file,
+            args.threshold,
+            args.nms,
+            args.reduceby,
+            args.every,
+            args.verbose))
 
     sys.stdout.flush()
     sys.stderr.flush()
 
-    main(args.use_gpu, args.caffe_model, args.prototxt_file, args.threshold, args.nms, args.reduceby, args.every, args.verbose) 
+    main(
+        args.use_gpu,
+        args.caffe_model,
+        args.prototxt_file,
+        args.threshold,
+        args.nms,
+        args.reduceby,
+        args.every,
+        args.verbose)
 
     print("Finished processing all media.")
