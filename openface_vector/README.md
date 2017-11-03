@@ -25,6 +25,8 @@ Download the pretrained Torch model from Carnegie Mellon's openface project [her
 docker run -v ~/dirWithMedia/:/media -v ~/dirWithBoundingBoxes/:/bboxes -v ~/outputDir:/out -v ~/dirWithModels/:/models vfs.openface_vector 
 ```
 
+Note: The pretrained torch model should be located in the /models volume mount
+
 ### run the CPU container to vectorize face chips with custom parameters
 
 ```Shell

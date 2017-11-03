@@ -1,0 +1,89 @@
+# Modified version of Dockerface by Nataniel Ruiz at Georgia Institute of Technology 
+# https://github.com/natanielruiz/dockerface
+# https://github.com/natanielruiz/py-faster-rcnn-dockerface
+
+FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        git \
+        wget \
+        libatlas-base-dev \
+        libboost-all-dev \
+        libgflags-dev \
+        libgoogle-glog-dev \
+        libhdf5-serial-dev \
+        libleveldb-dev \
+        liblmdb-dev \
+        libopencv-dev \
+        libprotobuf-dev \
+        libsnappy-dev \
+        protobuf-compiler \
+        python-dev \
+        python-numpy \
+        python-pip \
+        python-setuptools \
+        python-scipy && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV FAST_RCNN_ROOT=/opt
+WORKDIR $FAST_RCNN_ROOT
+
+# Install OpenCV
+RUN git clone https://github.com/opencv/opencv.git && \
+	cd opencv && \
+	mkdir build && \
+	cd build && \
+	cmake .. -DWITH_FFMPEG=ON && \
+	make -j20 && make install && \
+	cd ../..
+
+RUN pip install --upgrade pip && \
+	pip install cython && \
+	pip install easydict
+
+RUN apt-get update && \
+	apt-get -y install python-tk
+
+# Build Cython modules for RCNN 
+RUN git clone https://github.com/natanielruiz/py-faster-rcnn-dockerface py-faster-rcnn && \
+	cd py-faster-rcnn && \
+	#mkdir output && cd output && mkdir faster_rcnn_end2end && cd faster_rcnn_end2end && \
+	#mkdir wider && cd wider && \
+	#wget "https://www.dropbox.com/s/dhtawqycd32ca9v/vgg16_dockerface_iter_80000.caffemodel" && \
+	#cd ../../.. && \
+	cd lib && \
+	make && \
+	cd .. && \
+	rm -r caffe-fast-rcnn 
+
+# Install caffe f-rcnn configuration
+RUN git clone https://github.com/owphoo/caffe_fast_rcnn.git caffe-fast-rcnn && \
+	cd caffe-fast-rcnn && \
+	cd python && for req in $(cat requirements.txt) pydot; do pip install $req; done && cd .. && \
+	mkdir build && cd build && \
+	cmake -DUSE_CUDNN=1 .. && \
+	make -j"$(nproc)" && \
+	make pycaffe
+
+# For visualization when processing video
+RUN pip install tqdm
+
+ENV CAFFE_ROOT=/opt/caffe-fast-rcnn
+ENV PYCAFFE_ROOT=$CAFFE_ROOT/python
+ENV PYTHONPATH=/prog:/opt/py-faster-rcnn/lib:$PYCAFFE_ROOT:PYTHONPATH
+ENV PATH=$CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
+RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+
+# Set Caffe to quiet mode; comment out for verbose mode
+ENV GLOG_minloglevel=3
+
+ADD . /prog
+# Avoid name collision of two utils folders by combining them
+RUN mv /opt/py-faster-rcnn/lib/utils/* /prog/utils/
+RUN rm -rf /opt/py-faster-rcnn/lib/utils 
+
+WORKDIR /prog/frcnn_detect
+ENTRYPOINT ["/usr/bin/python","run_frcnn.py"]
+CMD ["--use_gpu","True"]

@@ -1,4 +1,5 @@
-FROM nvidia/cuda:8.0-cudnn5-devel
+#FROM nvidia/cuda:8.0-cudnn5-devel
+FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu14.04
 
 RUN apt-get update && \
         apt-get install -y \
@@ -47,11 +48,16 @@ ENV PATH /opt/conda/bin:$PATH
 RUN pip install numpy
 
 RUN conda install -c menpo dlib=19.4
-RUN pip install opencv-python
+RUN conda config --add channels conda-forge
+RUN conda install opencv
 RUN pip install git+https://github.com/ageitgey/face_recognition_models
 
 ADD . /prog
 WORKDIR /prog/openface_vector
+
+# set cuda to True in lua config file for gpu
+RUN sed -i "s/'-cuda', false/'-cuda', true/" openface_server.lua
+
 ENV PYTHONPATH=/prog:$PYTHONPATH
 ENTRYPOINT ["/opt/conda/bin/python","run_openface.py"]
 CMD ["--use_gpu","True"]
