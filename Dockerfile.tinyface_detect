@@ -72,7 +72,7 @@ WORKDIR /hr101_mxnet
 RUN python matconvnet_hr101_to_mxnet.py
 
 ADD . /prog
-RUN mv /hr101_mxnet/* /prog/tinyface/
+RUN mv /hr101_mxnet/* /prog/tinyface_detect/
 ENV PYTHONPATH=/prog:$PYTHONPATH
 WORKDIR /prog/tinyface_detect
 ENTRYPOINT ["/opt/conda/bin/python","run_tinyface.py"]
