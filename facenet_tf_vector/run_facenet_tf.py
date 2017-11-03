@@ -156,7 +156,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    if not os.path.isfile(args.facenet_model):
+    if not os.path.isdir(args.facenet_model) and not os.path.isfile(args.facenet_model) :
         print("Error - Required Tensorflow model was not found. Please verify your Tensorflow model is located at {0}".format(args.facenet_model))
         quit()
 
