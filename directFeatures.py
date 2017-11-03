@@ -126,6 +126,25 @@ def normalize_faces(pic, places, jitters):
 
     return ret_val
 
+# getframe
+
+
+def get_frame_inefficient(filename, frame_number):
+    camera = cv2.VideoCapture(filename)
+    camera.set(1, frame_number)
+    keep_going, image = camera.read()
+    camera.release()
+    return (keep_going, image)
+
+# get movie length
+
+
+def get_movie_length(filename):
+    camera = cv2.VideoCapture(filename)
+    ret_val = camera.get(cv2.CAP_PROP_FRAME_COUNT)
+    camera.release()
+    return ret_val
+
 
 def process_vid(filename, reduceby, every, tolerance, jitters):
 
@@ -134,8 +153,9 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
     filename = filename.split('/')[-1]
     in_filename = join('/in', filename)
 
-    camera = cv2.VideoCapture(in_filename)
-    capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
+    #camera = cv2.VideoCapture(in_filename)
+    #capture_length = int(camera.get(cv2.CAP_PROP_FRAME_COUNT))
+    capture_length = get_movie_length(filename)
 
     progress = tqdm(total=capture_length)
 
@@ -157,12 +177,13 @@ def process_vid(filename, reduceby, every, tolerance, jitters):
                 progress.close()
                 break
             frame_number += every
-            camera.set(1, frame_number)
+            #camera.set(1, frame_number)
             progress.update(every)
         else:
             first = False
 
-        keep_going, img = camera.read()
+        #keep_going, img = camera.read()
+        keep_going, img = get_frame_inefficient(filename, frame_number)
 
         # only face detect every once in a while
         progress.set_description(
