@@ -17,7 +17,7 @@ Note: Run this command from the videofacesummary root folder
 ### run the CPU container to detect faces with default parameters
 
 ```Shell
-docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlibi_detect
+docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlib_detect
 ```
 
 ### run the CPU container to detect faces with custom parameters

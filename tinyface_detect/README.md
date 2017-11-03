@@ -27,7 +27,7 @@ docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_detect --r
 
   * **reduceby** = Factor to reduce image/video frame resolution (ex: 1.0 = original resolution, 2.0 -> reduce horizontal and vertical resolution by 2)  
   * **every** = Process every nth frame (ex: 30 = every 30th frame of video)
-  * **prob_thresh** = TinyFace Detector threshold for face likelihood (default = 0.7)
+  * **prob_thresh** = TinyFace Detector threshold for face likelihood (default = 0.85)
   * **nms_thresh** = TinyFace Detector threshold for non-maximum suppression
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)
 
@@ -53,6 +53,6 @@ nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_gpu
   * **use_gpu** = Flag to use gpu. It must be explicitly set to true when submitting custom parameters (default=False). 
   * **reduceby** = Factor to reduce image/video frame resolution (ex: 1.0 = original resolution, 2.0 -> reduce horizontal and vertical resolution by 2)  
   * **every** = Process every nth frame (ex: 30 = every 30th frame of video)
-  * **prob_thresh** = TinyFace Detector threshold for face likelihood (default = 0.7)
+  * **prob_thresh** = TinyFace Detector threshold for face likelihood (default = 0.85)
   * **nms_thresh** = TinyFace Detector threshold for non-maximum suppression
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)

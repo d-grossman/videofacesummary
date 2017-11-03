@@ -14,6 +14,7 @@ Instructions for building and running the containers for each technique can be f
 1. dlib_detect - Based on the dlib library's facial landmarks models
 2. mtcnn_detect - Based on the Multi Task CNN algorithm
 3. tinyface_detect - Based on the TinyFace algorithm
+4. frcnn_detect - Based on Faster R-CNN 
 
 Output of the Face Detection Techniques is a pickle file for each video or image. The pickle files contains a list of bounding boxes for detected faces found in the video or image.
 

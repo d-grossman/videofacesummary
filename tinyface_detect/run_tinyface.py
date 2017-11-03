@@ -5,8 +5,7 @@ import cv2
 from os.path import splitext, isdir
 from time import time
 
-#from tinyface_detect.tinyface_face_extractor import extract_tinyfaces
-import extract_tinyfaces
+from tinyface_face_extractor import extract_tinyfaces
 from utils.get_md5 import file_digest
 from utils.match_to_faces import write_out_pickle
 
@@ -238,8 +237,8 @@ if __name__ == '__main__':
     parser.add_argument(
         "--prob_thresh",
         type=float,
-        default=0.7,
-        help="Tiny Face Detector threshold for face likelihood (default = 0.7)")
+        default=0.85,
+        help="Tiny Face Detector threshold for face likelihood (default = 0.85)")
 
     parser.add_argument(
         "--nms_thresh",
