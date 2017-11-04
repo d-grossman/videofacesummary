@@ -61,6 +61,13 @@ RUN mkdir /out
 
 RUN jupyter nbextension enable --py widgetsnbextension
 
+RUN pip install https://github.com/ipython-contrib/jupyter_contrib_nbextensions/tarball/master
+RUN pip install jupyter_nbextensions_configurator
+RUN jupyter contrib nbextension install --user
+RUN jupyter nbextensions_configurator enable --user
+RUN conda install ipyparallel
+RUN ipcluster nbextension enable
+
 RUN pip install tensorflow==1.2
 
 ADD . /prog
