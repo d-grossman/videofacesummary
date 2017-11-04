@@ -54,12 +54,14 @@ RUN conda install -c menpo dlib=19.4
 
 RUN pip install git+https://github.com/ageitgey/face_recognition_models
 
-RUN pip install scikit-image jupyter notebook bokeh sklearn
+RUN pip install scikit-image  image tqdm jupyter notebook bokeh sklearn
 
 RUN mkdir /in
 RUN mkdir /out
 
 RUN jupyter nbextension enable --py widgetsnbextension
+
+RUN pip install tensorflow==1.2
 
 ADD . /prog
 WORKDIR /prog
