@@ -39,7 +39,7 @@ def match_to_faces(
             if match[0]:
                 exists = True
                 name = person
-                times.append((frame_number, (top, left, bottom, right)))
+                times.append((frame_number, (top, right, bottom, left)))
 
         # didnt find face, make a new entry
         if not exists:
@@ -52,7 +52,7 @@ def match_to_faces(
             current['file_content_hash'] = file_content_hash
             current['face_pic'] = face_pic
             current['times'] = list()
-            current['times'].append((frame_number, (top, left, bottom, right)))
+            current['times'].append((frame_number, (top, right, bottom, left)))
 
         list_face_names.append(name)
 
