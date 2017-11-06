@@ -33,7 +33,7 @@ ENV PATH /opt/conda/bin:$PATH
 RUN pip install numpy
 
 WORKDIR /
-RUN wget https://github.com/opencv/opencv/archive/3.3.1.zip\
+RUN wget https://github.com/opencv/opencv/archive/3.3.1.zip \
 && unzip 3.3.1.zip \
 && mkdir /opencv-3.3.1/cmake_binary \
 && cd /opencv-3.3.1/cmake_binary \
