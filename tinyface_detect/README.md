@@ -56,3 +56,19 @@ nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_gpu
   * **prob_thresh** = TinyFace Detector threshold for face likelihood (default = 0.85)
   * **nms_thresh** = TinyFace Detector threshold for non-maximum suppression
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)
+
+### test TinyFace face detection on a set of hand labeled images
+
+Warning - TinyFace uses a large amount of memory to process large images. You may see a 'Killed' message if your container runs out memory.
+
+1. build the container
+```Shell
+docker build -f Dockerfile.tinyface_detect -t vfs.tinyface_detect .
+```
+2. run the container interactively
+```Shell
+docker run --entrypoint=/bin/bash -it vfs.tinyface_detect
+```
+3. execute test at commmand line
+```Shell
+python test_tinyface_detection.py

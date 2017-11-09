@@ -72,7 +72,7 @@ RUN pip install tqdm
 
 ENV CAFFE_ROOT=/opt/caffe-fast-rcnn
 ENV PYCAFFE_ROOT=$CAFFE_ROOT/python
-ENV PYTHONPATH=/prog:/opt/py-faster-rcnn/lib:$PYCAFFE_ROOT:PYTHONPATH
+ENV PYTHONPATH=/prog:/opt/py-faster-rcnn/lib:$PYCAFFE_ROOT:$PYTHONPATH
 ENV PATH=$CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
 RUN echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
 
