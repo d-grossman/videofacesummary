@@ -170,7 +170,7 @@ def identify_chips(
 
 def main(
         use_gpu=False,
-        prob_thresh=0.7,
+        prob_thresh=0.85,
         nms_thresh=0.1,
         reduceby=1,
         every=30,

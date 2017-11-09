@@ -175,9 +175,9 @@ def identify_chips(image, frame_number, threshold, nms_thresh, reduceby, net):
 
 
 def main(
-        use_gpu,
-        caffe_model,
-        prototxt_file,
+        use_gpu=True,
+        caffe_model="/models/vgg16_dockerface_iter_80000.caffemodel",
+        prototxt_file="/opt/py-faster-rcnn/models/face/VGG16/faster_rcnn_end2end/test.prototxt",
         threshold=0.85,
         nms=0.15,
         reduceby=1,

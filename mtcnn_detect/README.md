@@ -66,3 +66,17 @@ nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.mtcnn_gpu_de
   * **reduceby** = Factor to reduce media resolution (ex: 1.0 = original resolution, 2.0 -> reduce horizontal and vertical resolution by 2)
   * **every** = Process every nth frame (ex: 30 = every 30th frame of video)
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)")
+
+### test MTCNN face detection on a set of hand labeled images
+
+1. build the container
+```Shell
+docker build -f Dockerfile.mtcnn_detect -t vfs.mtcnn_detect .
+```
+2. run the container interactively
+```Shell
+docker run --entrypoint=/bin/bash -it vfs.mtcnn_detect
+```
+3. execute test at commmand line
+```Shell
+python test_mtcnn_detection.py
