@@ -57,11 +57,11 @@ nvidia-docker run -v /dirWithMedia:/media -v /outputDir:/bboxes vfs.tinyface_gpu
   * **nms_thresh** = TinyFace Detector threshold for non-maximum suppression
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)
 
-### test TinyFace face detection on a set of hand labeled images
+### test TinyFace face detection on a set of hand labeled images (Detect Count) or PubFig dataset (IOU)
 
 Warning - TinyFace uses a large amount of memory to process large images. You may see a 'Killed' message if your container runs out memory.
 
-1. build the container
+1. build the container  
 ```Shell
 docker build -f Dockerfile.tinyface_detect -t vfs.tinyface_detect .
 ```
@@ -69,6 +69,11 @@ docker build -f Dockerfile.tinyface_detect -t vfs.tinyface_detect .
 ```Shell
 docker run --entrypoint=/bin/bash -it vfs.tinyface_detect
 ```
-3. execute test at commmand line
+3. execute face count test at commmand line
 ```Shell
 python test_tinyface_detection.py
+```
+Note: Execute an IOU test by passing in test_type 
+```Shell
+python test_tinyface_detection.py --test_type iou
+```
