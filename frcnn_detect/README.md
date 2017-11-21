@@ -55,7 +55,7 @@ docker build -f Dockerfile.frcnn_gpu_detect -t vfs.frcnn_gpu_detect .
 ```
 2. run the container interactively
 ```Shell
-nividia-docker run --entrypoint=/bin/bash -it vfs.frcnn_gpu_detect
+nividia-docker run -v /models:/models --entrypoint=/bin/bash -it vfs.frcnn_gpu_detect
 ```
 3. execute test at commmand line
 ```Shell
