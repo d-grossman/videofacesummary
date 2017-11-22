@@ -22,4 +22,4 @@ if __name__ == "__main__":
     in_file = sys.argv[1]
     out_file = sys.argv[2]
     out_data = reconsile(in_file)
-    pickle.dump(out_data,open('out_file','wb'))
+    pickle.dump(out_data,open(out_file,'wb'))
