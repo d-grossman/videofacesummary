@@ -32,7 +32,7 @@ docker run -v ~/dirWithMedia:/media -v ~/outputDir:/bboxes vfs.dlib_detect --red
   * **every** = Process every nth frame (ex: 30 = every 30th frame of video)
   * **verbose** = Print out information related to image processing time and vectorization results (default: False)")
  
-### test dlib face detection on a set of hand labeled images
+### test dlib face detection on a set of hand labeled images (Detect Count) or PubFig dataset (IOU)
 
 1. build the container
 ```Shell
@@ -45,4 +45,8 @@ docker run --entrypoint=/bin/bash -it vfs.dlib_detect
 3. execute test at commmand line
 ```Shell
 python test_dlib_detection.py
+```
+Note: Execute an IOU test by passing in test_type 
+```Shell
+python test_dlib_detection.py --test_type iou
 ```

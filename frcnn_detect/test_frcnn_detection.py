@@ -1,13 +1,14 @@
 import cv2
 from os.path import basename
-from utils.get_test_images import get_test_images
+from utils.get_test_images import get_test_images, get_iou_images
 from frcnn_detect.run_frcnn import identify_chips
 from fast_rcnn.config import cfg
 import timeit
 import caffe
+from utils.get_iou import get_iou
 
 
-def main(test_file, test_folder, test_type, caffe_model, prototxt_file, use_gpu, threshold, nms_thresh):
+def main(test_file, iou_url, test_folder, test_type, caffe_model, prototxt_file, use_gpu, threshold, nms_thresh):
 
     cfg.TEST.HAS_RPN = True  # Use RPN for proposals
 
@@ -22,10 +23,10 @@ def main(test_file, test_folder, test_type, caffe_model, prototxt_file, use_gpu,
     net = caffe.Net(prototxt_file, caffe_model, caffe.TEST)
     #net = caffe.Net(prototxt_file, caffe.TEST, "weights="+caffe_model)
 
-    # Get dictionary with ground truth for test images from test_file
-    pic_to_faces = get_test_images(test_file, test_folder)
-
     if test_type == 'facecount':
+        # Get dictionary with ground truth for test images from test_file
+        pic_to_faces = get_test_images(test_file, test_folder)
+
         detection_results = list()
         total_truth = sum(list(pic_to_faces.values()))
         exact_matches = 0
@@ -53,6 +54,8 @@ def main(test_file, test_folder, test_type, caffe_model, prototxt_file, use_gpu,
         print("Total Faces Detected {0} - Total True Faces {1}".format(total_detections, total_truth))
 
     elif test_type == 'duration':
+        # Get dictionary with ground truth for test images from test_file
+        pic_to_faces = get_test_images(test_file, test_folder)
 
         duration_results = list()
         # Run detections
@@ -73,6 +76,39 @@ def main(test_file, test_folder, test_type, caffe_model, prototxt_file, use_gpu,
         final_duration_avg = '%.2f' % (float(total_durations)/len(duration_results))
         print("Overall Average Detection Duration {0}".format(final_duration_avg))
 
+    elif test_type == 'iou':
+        pic_to_bbox = get_iou_images(iou_url, test_folder)
+        iou_results = list()
+        good_matches = 0
+        bad_matches = 0
+
+        # Run iou
+        for item in pic_to_bbox:
+            image = cv2.imread(item)
+            truth = pic_to_bbox[item]
+            file = basename(item)
+            face_locations, _ = identify_chips(image, frame_number=-1, threshold=threshold, nms_thresh=nms_thresh,
+                                               reduceby=1, net=net)
+            # Only one face bounding box for iou test set but some pictures have multiple people; take max iou
+            best = 0.0
+            for face_location in face_locations[1]:
+                t, r, b, l = face_location
+                formatted_face_location = [l, t, r, b]
+                result = get_iou(formatted_face_location, truth)
+                if result > best:
+                    best = result
+
+            iou_results.append(best)
+            if best > 0.5:
+                good_matches += 1
+            print("File {0} - IOU {1}".format(file, '%.2f' % best))
+
+        print("\nBounding Boxes IOU > 0.50 for {0} Test Images: {1}".format(len(pic_to_bbox),good_matches))
+        #print("Bounding Boxes IOU <= 0.50 for {0} Test Images: {1}".format(len(pic_to_bbox), bad_matches))
+        iou_average = '%.2f' % (float(sum(iou_results))/len(pic_to_bbox))
+        print("Average IOU for {0} Test Images = {1}".format(len(pic_to_bbox), iou_average))
+
+
 
 if __name__ == '__main__':
     import argparse
@@ -86,6 +122,12 @@ if __name__ == '__main__':
         default="/prog/test_data/url_file_faces_hash.txt",
         help='Comma delimited file with urls and number of faces in image (manually labeled). (default = url_numfaces.txt')
 
+    parser.add_argument(
+        '--iou_url',
+        type=str,
+        default="http://www.cs.columbia.edu/CAVE/databases/pubfig/download/eval_urls.txt",
+        help='URL for PubFig dataset tab delimited evaluation file (format: person imagenum url rect md5sum). (default = http://www.cs.columbia.edu/CAVE/databases/pubfig/download/eval_urls.txt')
+
     # Optional args
     parser.add_argument(
         '--test_images',
@@ -97,7 +139,7 @@ if __name__ == '__main__':
         '--test_type',
         type=str,
         default="facecount",
-        help="Type of test to run. Options are 'facecount' or 'duration' (default = facecount")
+        help="Type of test to run. Options are 'facecount', 'iou' or 'duration' (default = facecount")
 
     parser.add_argument(
         '--caffe_model',
@@ -134,15 +176,17 @@ if __name__ == '__main__':
     print(
         "Test parameters set as: \n \
            Test input file = {0} \n \
-           Test image folder = {1} \n \
-           Test Type = {2} \n  \
-           Caffe Model = {3} \n \
-           Prototxt File = {4} \n \
-           Use GPU = {5} \n \
-           Probability Threshold = {6} \n \
-           NMS Threshold = {7} \n "
-            .format(
+           IOU url = {1} \n \
+           Test image folder = {2} \n \
+           Test Type = {3} \n  \
+           Caffe Model = {4} \n \
+           Prototxt File = {5} \n \
+           Use GPU = {6} \n \
+           Probability Threshold = {7} \n \
+           NMS Threshold = {8} \n "
+        .format(
             args.test_file,
+            args.iou_url,
             args.test_images,
             args.test_type,
             args.caffe_model,
@@ -150,6 +194,6 @@ if __name__ == '__main__':
             args.use_gpu,
             args.threshold,
             args.nms_thresh))
-    main(args.test_file, args.test_images, args.test_type, args.caffe_model, args.prototxt_file, args.use_gpu, args.threshold, args.nms_thresh)
+    main(args.test_file, args.iou_url, args.test_images, args.test_type, args.caffe_model, args.prototxt_file, args.use_gpu, args.threshold, args.nms_thresh)
     print("Finished test.")
 
