@@ -1,7 +1,6 @@
 # videofacesummary
 makes a summary of faces seen in a video or image
 
-
 # *Face Detection and Chip Vectorization*
 
 The process to analyze a batch of media (videos or images) using this repository is:
